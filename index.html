@@ -28,7 +28,7 @@
 		button { cursor: pointer; }
 		.shell { width: min(1260px, calc(100% - 48px)); margin: 0 auto; }
 		.topbar { border-bottom: 1px solid var(--line); background: rgba(255,254,250,.82); }
-		.topbar-inner { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+		.topbar-inner { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
 		.brand { display: flex; align-items: center; gap: 12px; }
 		.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--green); font-size: 19px; font-weight: 700; }
 		.brand-title { margin: 0; font: 700 18px/1.1 Georgia, serif; letter-spacing: 0; }
@@ -37,23 +37,26 @@
 		.saved-dot { width: 8px; height: 8px; border-radius: 50%; background: #5d9c73; }
 		select, input, textarea { color: var(--ink); }
 		.filter-select { background: transparent; border: 0; font-weight: 650; padding: 8px 22px 8px 4px; }
-		main { padding: 34px 0 56px; }
-		.intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+		main { padding: 12px 0 18px; }
+		.intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 10px; }
 		.eyebrow { margin: 0 0 8px; color: var(--green); text-transform: uppercase; letter-spacing: 1.3px; font-size: 10px; font-weight: 750; }
 		h1 { font: 700 clamp(26px, 4vw, 36px)/1.05 Georgia, serif; letter-spacing: 0; margin: 0; }
 		.month-label { border: 1px solid var(--line); background: var(--surface); padding: 10px 13px; border-radius: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; }
-		.summary-grid { display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 22px; }
-		.summary-card { min-height: 108px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+		.summary-grid { display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+		.summary-card { min-height: 74px; padding: 11px 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
 		.summary-card.total { color: white; background: var(--green); border-color: var(--green); position: relative; overflow: hidden; }
 		.summary-card.total:after { content: ""; position: absolute; right: -28px; top: -48px; width: 150px; height: 150px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,255,255,.035), 0 0 0 38px rgba(255,255,255,.025); }
 		.summary-label { color: var(--muted); font-size: 12px; font-weight: 650; }
 		.total .summary-label { color: rgba(255,255,255,.75); }
-		.summary-value { margin-top: 13px; font: 700 29px/1 Georgia, serif; letter-spacing: 0; }
+		.summary-value { margin-top: 8px; font: 700 24px/1 Georgia, serif; letter-spacing: 0; }
 		.summary-icon { float: right; font-size: 20px; color: var(--green); background: var(--green-soft); border-radius: 9px; width: 34px; height: 34px; display: grid; place-items: center; }
-		.content-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(290px, .85fr); align-items: start; gap: 18px; }
+		.content-grid { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 8px; }
 		.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
 		.ledger { min-width: 0; }
-		.panel-head { padding: 20px 22px 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+		.panel-head { padding: 14px 18px 10px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+		.ledger-actions { display: flex; align-items: center; gap: 7px; }
+		.primary-small { min-height: 34px; border: 0; border-radius: 6px; padding: 0 11px; color: #fff; background: var(--green); font-size: 12px; font-weight: 700; }
+		.primary-small:hover { background: #115b45; }
 		.panel-title { margin: 0; font: 700 20px/1.2 Georgia, serif; letter-spacing: 0; }
 		.panel-caption { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
 		.tabs { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--line); padding: 0 22px; }
@@ -65,6 +68,15 @@
 		.filter-select { color: var(--muted); font-size: 12px; }
 		.table-scroll { overflow-x: auto; }
 		table { width: 100%; border-collapse: collapse; text-align: left; }
+		.ledger .table-scroll { overflow: visible; }
+		.ledger table { table-layout: fixed; }
+		.ledger th, .ledger td { white-space: normal; overflow-wrap: anywhere; }
+		.ledger th:nth-child(1) { width: 34%; }
+		.ledger th:nth-child(2) { width: 15%; }
+		.ledger th:nth-child(3) { width: 13%; }
+		.ledger th:nth-child(4) { width: 16%; }
+		.ledger th:nth-child(5) { width: 14%; }
+		.ledger th:nth-child(6) { width: 42px; }
 		th { color: #89918c; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; font-weight: 750; padding: 10px 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); white-space: nowrap; }
 		th:first-child, td:first-child { padding-left: 22px; }
 		th:last-child, td:last-child { padding-right: 22px; }
@@ -124,7 +136,7 @@
 		.auth-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 		.text-button { border: 0; padding: 8px 0; color: var(--green); background: none; font-size: 12px; font-weight: 700; white-space: nowrap; }
 		.auth-note { padding: 11px 12px; border-radius: 6px; background: #edf3eb; color: #526653 !important; font-size: 11px !important; }
-		.access-queue { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--line); }
+		.access-queue { margin: 0; padding: 12px 16px; }
 		.access-queue h3 { display: flex; justify-content: space-between; margin: 0 0 10px; font: 700 14px Georgia, serif; }
 		.access-request-list { display: grid; gap: 8px; }
 		.access-request { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
@@ -133,13 +145,23 @@
 		.access-request-actions { display: flex; gap: 5px; }
 		.access-request-actions button { border: 0; border-radius: 5px; padding: 7px 8px; color: #fff; background: var(--green); font-size: 10px; font-weight: 700; }
 		.access-request-actions button.reject { color: #8b4032; background: var(--coral-soft); }
-		.member-report { margin-bottom: 22px; }
+		.member-report { margin-bottom: 8px; }
 		.member-report .panel-caption { margin-top: 5px; }
 		.member-name { font-weight: 750; }
 		.card-list { display: grid; gap: 3px; white-space: normal; min-width: 145px; }
 		.card-list span { color: var(--muted); font-size: 10px; }
 		.total-row td { background: #f5f7f2; font-weight: 750; }
 		.type-button { min-height: 38px; }
+		.details-panel { margin-top: 6px; }
+		.details-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; cursor: pointer; list-style: none; }
+		.details-summary::-webkit-details-marker { display: none; }
+		.details-summary h2 { margin: 0; font: 700 16px Georgia, serif; }
+		.details-content { border-top: 1px solid var(--line); }
+		.movement-dialog { width: min(520px, calc(100% - 24px)); max-width: 520px; max-height: 92dvh; padding: 0; border: 0; border-radius: 8px; background: transparent; overflow: auto; }
+		.movement-dialog::backdrop { background: rgba(18, 31, 27, .46); }
+		.dialog-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; background: var(--surface); border-bottom: 1px solid var(--line); border-radius: 8px 8px 0 0; font: 700 16px Georgia, serif; }
+		.dialog-top button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--muted); }
+		.movement-dialog .form-panel { border-radius: 0 0 8px 8px; }
 		.account-label { color: var(--muted); font-size: 12px; }
 		.account-email { color: var(--ink); font-weight: 700; }
 		.signout-button { border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 6px; padding: 8px 10px; font-size: 11px; font-weight: 700; }
@@ -148,6 +170,24 @@
 		@media (max-width: 420px) { .shell { width: calc(100% - 20px); } .brand-title { font-size: 16px; } .top-controls { gap: 5px; } .panel-head { align-items: start; } .panel-title { font-size: 18px; } .tabs { padding-left: 12px; padding-right: 12px; } .tab { padding-left: 6px; padding-right: 6px; font-size: 11px; } .table-tools { padding-left: 12px; padding-right: 12px; } .two-fields { gap: 7px; } }
 		@media (max-width: 720px) {
 			.summary-card:last-child { grid-column: 1 / -1; }
+			.side-column { grid-row: 2; }
+			.ledger { grid-row: 1; }
+			.ledger .table-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+			.ledger .search { width: 100%; min-width: 0; }
+			.ledger .filter-select { max-width: 145px; }
+			.ledger table, .ledger tbody { display: block; width: 100%; }
+			.ledger thead { display: none; }
+			.ledger tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "movement amount actions" "person date status"; align-items: center; gap: 5px 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+			.ledger tbody td { min-width: 0; padding: 0 !important; border: 0; white-space: normal; overflow-wrap: anywhere; }
+			.ledger tbody td:nth-child(1) { grid-area: movement; }
+			.ledger tbody td:nth-child(2) { grid-area: person; }
+			.ledger tbody td:nth-child(3) { grid-area: date; color: var(--muted); font-size: 10px; }
+			.ledger tbody td:nth-child(4) { grid-area: status; justify-self: end; }
+			.ledger tbody td:nth-child(5) { grid-area: amount; font-size: 13px; }
+			.ledger tbody td:nth-child(6) { grid-area: actions; }
+			.ledger .movement-meta { white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+			.ledger .person-cell { font-size: 10px; }
+			.ledger .avatar { width: 20px; height: 20px; flex-basis: 20px; }
 			.member-report .table-scroll { overflow: visible; }
 			.member-report table, .member-report tbody { display: block; width: 100%; }
 			.member-report thead { display: none; }
@@ -158,6 +198,42 @@
 			.member-report tbody td:first-child { grid-column: 1 / -1; }
 			.member-report tbody tr.total-row { background: #f5f7f2; padding: 9px 0; }
 			.member-report tbody tr.total-row td { font-weight: 750; }
+		}
+		@media (max-width: 720px) {
+			main { padding: 12px 0 20px; }
+			.intro { flex-direction: row; align-items: center; margin-bottom: 8px; }
+			.intro h1 { font-size: 22px; }
+			.summary-grid { grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+			.summary-card, .summary-card.total, .summary-card:last-child { grid-column: auto; min-height: 66px; padding: 8px 10px; }
+			.summary-label { font-size: 10px; }
+			.summary-value { margin-top: 6px; font-size: 17px; }
+			.summary-icon { width: 22px; height: 22px; font-size: 14px; }
+			.month-label { padding: 6px 8px; font-size: 10px; }
+			.panel-head { padding: 10px 12px 7px; }
+			.panel-title { font-size: 17px; }
+			.panel-caption { font-size: 10px; }
+			.tabs { padding: 0 10px; }
+			.tab { padding: 8px 7px 9px; font-size: 11px; }
+			.table-tools { padding: 6px 10px; }
+			.ledger .table-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+			.ledger .search { width: 100%; min-width: 0; }
+			.ledger .filter-select { max-width: 135px; }
+			.ledger-actions { gap: 5px; }
+			.primary-small { min-height: 30px; padding: 0 8px; font-size: 11px; }
+			.ledger table, .ledger tbody { display: block; width: 100%; }
+			.ledger thead { display: none; }
+			.ledger tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "movement amount actions" "person date status"; align-items: center; gap: 4px 7px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+			.ledger tbody td { min-width: 0; padding: 0 !important; border: 0; white-space: normal; overflow-wrap: anywhere; }
+			.ledger tbody td:nth-child(1) { grid-area: movement; }
+			.ledger tbody td:nth-child(2) { grid-area: person; }
+			.ledger tbody td:nth-child(3) { grid-area: date; color: var(--muted); font-size: 10px; }
+			.ledger tbody td:nth-child(4) { grid-area: status; justify-self: end; }
+			.ledger tbody td:nth-child(5) { grid-area: amount; font-size: 12px; }
+			.ledger tbody td:nth-child(6) { grid-area: actions; }
+			.ledger .movement-meta { white-space: normal; overflow-wrap: anywhere; line-height: 1.25; font-size: 9px; }
+			.ledger .person-cell { font-size: 10px; }
+			.ledger .avatar { width: 19px; height: 19px; flex-basis: 19px; }
+			.movement-pagination { padding: 5px 10px; }
 		}
 	</style>
 </head>
@@ -209,7 +285,7 @@
 			</div>
 		</div>
 	</header>
-	<main class="shell">
+			<main class="shell dashboard">
 		<section class="intro">
 			<h1>Resumen</h1>
 			<div class="month-label" id="currentMonth"></div>
@@ -220,13 +296,13 @@
 			<article class="summary-card"><span class="summary-icon" aria-hidden="true">⌂</span><span class="summary-label">Banco</span><div class="summary-value" id="bankBalance">$0.00</div></article>
 			<article class="summary-card"><span class="summary-icon" aria-hidden="true" style="color:var(--coral);background:var(--coral-soft)">−</span><span class="summary-label">Gastos del mes</span><div class="summary-value" id="monthlyExpenses">$0.00</div></article>
 		</section>
-		<section class="panel member-report hidden" id="memberReport">
-			<div class="panel-head"><div><h2 class="panel-title">Saldo por familiar</h2></div></div>
-			<div class="table-scroll"><table><thead><tr><th>Familiar</th><th>Efectivo</th><th>Banco</th><th>Tarjetas por pagar</th><th>Gastos pagados</th></tr></thead><tbody id="memberRows"></tbody></table></div>
-		</section>
+		<details class="panel member-report details-panel hidden" id="memberReport">
+			<summary class="details-summary"><h2>Saldo por familiar</h2><span>Ver detalle</span></summary>
+			<div class="details-content table-scroll"><table><thead><tr><th>Familiar</th><th>Efectivo</th><th>Banco</th><th>Tarjetas por pagar</th><th>Gastos pagados</th></tr></thead><tbody id="memberRows"></tbody></table></div>
+		</details>
 		<section class="content-grid">
 			<div class="panel ledger">
-				<div class="panel-head"><div><h2 class="panel-title">Movimientos</h2><p class="panel-caption" id="movementCaption">Movimientos aprobados</p></div><button class="icon-btn" id="exportButton" title="Descargar movimientos CSV" aria-label="Descargar movimientos CSV">↓</button></div>
+				<div class="panel-head"><div><h2 class="panel-title">Movimientos</h2><p class="panel-caption" id="movementCaption">Movimientos aprobados</p></div><div class="ledger-actions"><button class="primary-small" id="openMovement" type="button">＋ Nuevo</button><button class="icon-btn" id="exportButton" title="Descargar movimientos CSV" aria-label="Descargar movimientos CSV">↓</button></div></div>
 				<div class="tabs" role="tablist" aria-label="Filtrar movimientos">
 					<button class="tab active" data-tab="approved" role="tab" aria-selected="true">Aprobados</button>
 					<button class="tab" data-tab="pending" role="tab" aria-selected="false">Por revisar <span class="tab-count" id="pendingCount">0</span></button>
@@ -238,9 +314,9 @@
 					<div class="empty-state" id="emptyState"><div class="empty-symbol">＋</div><strong id="emptyTitle">Aún no hay movimientos</strong><div id="emptyCopy" style="margin-top:6px">Agrega el primer ingreso o gasto para comenzar.</div></div>
 				</div>
 			</div>
-			<aside class="side-column">
+			<dialog class="movement-dialog" id="movementDialog">
+				<div class="dialog-top"><span id="dialogTitle">Nuevo movimiento</span><button id="closeMovement" type="button" aria-label="Cerrar">×</button></div>
 				<section class="panel form-panel">
-						<div class="form-heading"><div><h2 id="formTitle">Nuevo movimiento</h2></div></div>
 					<form id="movementForm">
 						<div class="type-switch" role="group" aria-label="Tipo de movimiento">
 							<button class="type-button active" type="button" data-type="income">Ingreso</button><button class="type-button" type="button" data-type="expense">Gasto</button><button class="type-button" type="button" data-type="transfer">Traspaso</button><button class="type-button" type="button" data-type="cardPayment">Pago tarjeta</button>
@@ -266,14 +342,14 @@
 						<p class="approval-note" id="approvalNote"></p>
 					</form>
 				</section>
-				<section class="panel moderation-panel" id="moderationPanel">
-					<div class="moderation-title"><h2>Solicitudes de acceso</h2><span class="status pending" id="modeBadge">Omi</span></div>
-					<div class="access-queue hidden" id="accessQueue">
+			</dialog>
+			<details class="panel moderation-panel details-panel hidden" id="moderationPanel">
+				<summary class="details-summary"><h2>Solicitudes de acceso</h2><span class="status pending" id="modeBadge">Omi</span></summary>
+				<div class="details-content access-queue" id="accessQueue">
 						<h3>Pendientes <span class="tab-count" id="accessRequestCount">0</span></h3>
 						<div class="access-request-list" id="accessRequestList"></div>
 					</div>
-				</section>
-			</aside>
+			</details>
 		</section>
 	</main>
 	<div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -310,6 +386,7 @@
 			let stopQueueListener = null;
 			let currentType = 'income';
 			let activeTab = 'approved';
+			let editingMovementId = null;
 			let toastTimer;
 
 			function localDate(date = new Date()) {
@@ -440,16 +517,17 @@
 					const amountPrefix = item.type === 'income' ? '+' : item.type === 'expense' ? '−' : item.type === 'cardPayment' ? '↘' : '↔';
 					const status = item.status === 'approved' ? '<span class="status approved">Aprobado</span>' : '<span class="status pending">Por revisar</span>';
 					const review = item.status === 'pending' && canModerate ? `<span class="review-actions"><button class="review-button" data-action="approve" data-id="${escapeHtml(item.id)}">Aprobar</button><button class="review-button reject" data-action="reject" data-id="${escapeHtml(item.id)}">Rechazar</button></span>` : '';
+					const edit = canModerate ? `<button class="icon-btn" data-action="edit" data-id="${escapeHtml(item.id)}" aria-label="Editar movimiento" title="Editar">✎</button>` : '';
 					const remove = canModerate || (item.createdBy === authUser?.uid && item.status === 'pending') ? `<button class="icon-btn danger" data-action="delete" data-id="${escapeHtml(item.id)}" aria-label="Eliminar movimiento" title="Eliminar">×</button>` : '';
 					const note = item.notes ? ` · ${escapeHtml(item.notes)}` : '';
 					const creator = item.submittedBy ? ` · Capturado por ${escapeHtml(item.submittedBy)}` : '';
 					const payment = item.type === 'expense' ? ` · ${item.paymentMethod === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : item.paymentMethod === 'debit' ? 'Tarjeta de débito' : item.paymentMethod === 'transfer' ? 'Transferencia' : item.account === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : 'Efectivo'}` : item.type === 'cardPayment' ? ` · desde ${accountName(item.account)}` : '';
 					const recipient = item.type === 'transfer' && item.recipient && item.recipient !== item.person ? ` · para ${escapeHtml(item.recipient)}` : '';
 					const category = item.type === 'cardPayment' ? 'Abono a tarjeta' : item.category || 'General';
-					return `<tr><td><div class="movement-name">${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${remove}</div></td></tr>`;
+					return `<tr><td><div class="movement-name">${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${edit}${remove}</div></td></tr>`;
 				}).join('');
 				const empty = rows.length === 0;
-				document.querySelector('.table-scroll table').classList.toggle('hidden', empty);
+				document.querySelector('.ledger .table-scroll table').classList.toggle('hidden', empty);
 				document.querySelector('#emptyState').style.display = empty ? 'block' : 'none';
 				document.querySelector('#emptyTitle').textContent = activeTab === 'pending' ? 'No hay movimientos por revisar' : 'Aún no hay movimientos';
 				document.querySelector('#emptyCopy').textContent = activeTab === 'pending' ? 'Cuando alguien proponga un movimiento, aparecerá aquí.' : 'Agrega el primer ingreso o gasto para comenzar.';
@@ -512,6 +590,40 @@
 				document.querySelector('#cardNameField').classList.toggle('hidden', !usesCredit);
 				document.querySelector('#cardName').required = usesCredit;
 			}
+			function resetMovementForm() {
+				const form = document.querySelector('#movementForm');
+				if (!form) return;
+				editingMovementId = null;
+				form.reset();
+				setType('income');
+				document.querySelector('#dialogTitle').textContent = 'Nuevo movimiento';
+				document.querySelector('#date').value = today;
+				document.querySelector('#person').value = isModerator() ? 'Omi' : PEOPLE[0];
+				document.querySelector('#recipient').value = document.querySelector('#person').value;
+				document.querySelector('#submitButton').textContent = isModerator() ? 'Agregar movimiento' : 'Enviar movimiento';
+			}
+			function editMovement(movement) {
+				if (!isModerator()) return;
+				editingMovementId = movement.id;
+				const form = document.querySelector('#movementForm');
+				form.reset();
+				setType(movement.type);
+				document.querySelector('#dialogTitle').textContent = 'Editar movimiento';
+				document.querySelector('#description').value = movement.description || '';
+				document.querySelector('#amount').value = movement.amount ?? '';
+				document.querySelector('#account').value = movement.account === 'credit' ? 'bank' : movement.account || 'cash';
+				document.querySelector('#destination').value = movement.destination || 'bank';
+				document.querySelector('#recipient').value = movement.recipient || movement.person || PEOPLE[0];
+				document.querySelector('#category').value = movement.category || 'General';
+				document.querySelector('#paymentMethod').value = movement.paymentMethod || (movement.account === 'credit' ? 'credit' : movement.account === 'cash' ? 'cash' : 'transfer');
+				updateExpensePaymentFields();
+				document.querySelector('#cardName').value = movement.cardName || '';
+				document.querySelector('#person').value = movement.person || PEOPLE[0];
+				document.querySelector('#date').value = movement.date || today;
+				document.querySelector('#notes').value = movement.notes || '';
+				document.querySelector('#submitButton').textContent = 'Guardar cambios';
+				document.querySelector('#movementDialog').showModal();
+			}
 			document.querySelectorAll('.type-button').forEach(button => button.addEventListener('click', () => setType(button.dataset.type)));
 			document.querySelector('#paymentMethod').addEventListener('change', updateExpensePaymentFields);
 			document.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => {
@@ -521,8 +633,13 @@
 			}));
 			document.querySelector('#searchInput').addEventListener('input', renderRows);
 			document.querySelector('#personFilter').addEventListener('change', renderRows);
+			document.querySelector('#openMovement').addEventListener('click', () => { resetMovementForm(); document.querySelector('#movementDialog').showModal(); });
+			document.querySelector('#closeMovement').addEventListener('click', () => document.querySelector('#movementDialog').close());
+			document.querySelector('#movementDialog').addEventListener('click', event => { if (event.target === event.currentTarget) event.currentTarget.close(); });
+			document.querySelector('#movementDialog').addEventListener('close', resetMovementForm);
 			document.querySelector('#movementForm').addEventListener('submit', async event => {
 				event.preventDefault();
+				if (editingMovementId && !isModerator()) { showToast('Solo Omi puede editar movimientos.'); return; }
 				const movementForm = event.currentTarget;
 				const form = new FormData(movementForm);
 				const amount = Number(form.get('amount'));
@@ -534,9 +651,11 @@
 				if (!Number.isFinite(amount) || amount <= 0) { showToast('Escribe un importe válido.'); return; }
 				if (currentType === 'transfer' && account === destination && recipient === String(form.get('person'))) { showToast('El traspaso necesita cambiar de cuenta o de familiar.'); return; }
 				if ((currentType === 'cardPayment' || paymentMethod === 'credit') && !cardName) { showToast('Escribe el nombre de la tarjeta.'); return; }
-				const newMovementRef = push(ref(database, 'movements'));
+				const existingMovement = editingMovementId ? state.movements.find(item => item.id === editingMovementId) : null;
+				const movementRef = existingMovement ? ref(database, `movements/${existingMovement.id}`) : push(ref(database, 'movements'));
 				const movement = {
-					id: newMovementRef.key,
+					...(existingMovement || {}),
+					id: existingMovement?.id || movementRef.key,
 					type: currentType,
 					description: String(form.get('description')).trim(),
 					amount,
@@ -547,24 +666,21 @@
 					cardName: currentType === 'cardPayment' || paymentMethod === 'credit' ? cardName : '',
 					category: currentType === 'transfer' ? 'Traspaso' : currentType === 'cardPayment' ? 'Abono a tarjeta' : String(form.get('category')),
 					person: String(form.get('person')),
-					createdBy: authUser.uid,
-					submittedBy: activeUsername || usernameFromUser(authUser),
+					createdBy: existingMovement?.createdBy || authUser.uid,
+					submittedBy: existingMovement?.submittedBy || activeUsername || usernameFromUser(authUser),
 					date: String(form.get('date')),
 					notes: String(form.get('notes')).trim(),
-					status: isModerator() ? 'approved' : 'pending',
-					createdAt: Date.now()
+					status: existingMovement?.status || (isModerator() ? 'approved' : 'pending'),
+					createdAt: existingMovement?.createdAt || Date.now()
 				};
 				document.querySelector('#submitButton').disabled = true;
 				try {
-					await set(newMovementRef, movement);
-					movementForm.reset();
-					document.querySelector('#date').value = today;
-					document.querySelector('#person').value = PEOPLE[0];
-						document.querySelector('#recipient').value = PEOPLE[0];
-						setType(currentType);
+					if (existingMovement) await update(movementRef, movement);
+					else await set(movementRef, movement);
+					document.querySelector('#movementDialog').close();
 					activeTab = movement.status === 'pending' ? 'pending' : 'approved';
 					document.querySelector(`.tab[data-tab="${activeTab}"]`).click();
-					showToast(movement.status === 'approved' ? 'Movimiento agregado al saldo.' : 'Movimiento enviado para revisión.');
+					showToast(existingMovement ? 'Movimiento actualizado.' : movement.status === 'approved' ? 'Movimiento agregado al saldo.' : 'Movimiento enviado a revisión.');
 				} catch (error) { showToast(firebaseErrorMessage(error)); }
 				finally { document.querySelector('#submitButton').disabled = false; }
 			});
@@ -573,6 +689,7 @@
 				if (!button) return;
 				const movement = state.movements.find(item => item.id === button.dataset.id);
 				if (!movement) return;
+					if (button.dataset.action === 'edit') { if (isModerator()) editMovement(movement); return; }
 				const movementRef = ref(database, `movements/${movement.id}`);
 				try {
 				if (button.dataset.action === 'approve' && isModerator()) {
