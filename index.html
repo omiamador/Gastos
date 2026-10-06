@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f5f4ef">
+	<title>Fam Amador Arellano</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f5f4ef;
+			--surface: #fffefa;
+			--ink: #202a27;
+			--muted: #707a75;
+			--line: #e5e6df;
+			--green: #176b52;
+			--green-soft: #e4f0e9;
+			--coral: #c95d46;
+			--coral-soft: #f8eae5;
+			--gold: #b68032;
+			--gold-soft: #f6efdf;
+			--shadow: 0 12px 36px rgba(31, 46, 40, .06);
+			font-family: "Aptos", "Trebuchet MS", sans-serif;
+		}
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--paper); color: var(--ink); min-width: 320px; }
+		button, input, select, textarea { font: inherit; }
+		button { cursor: pointer; }
+		.shell { width: min(1260px, calc(100% - 48px)); margin: 0 auto; }
+		.topbar { border-bottom: 1px solid var(--line); background: rgba(255,254,250,.82); }
+		.topbar-inner { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+		.brand { display: flex; align-items: center; gap: 12px; }
+		.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: white; background: var(--green); font-size: 19px; font-weight: 700; }
+		.brand-title { margin: 0; font: 700 18px/1.1 Georgia, serif; letter-spacing: 0; }
+		.top-controls { display: flex; align-items: center; gap: 12px; }
+		.saved-state { color: var(--muted); font-size: 12px; display: flex; align-items: center; gap: 7px; }
+		.saved-dot { width: 8px; height: 8px; border-radius: 50%; background: #5d9c73; }
+		select, input, textarea { color: var(--ink); }
+		.filter-select { background: transparent; border: 0; font-weight: 650; padding: 8px 22px 8px 4px; }
+		main { padding: 34px 0 56px; }
+		.intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+		.eyebrow { margin: 0 0 8px; color: var(--green); text-transform: uppercase; letter-spacing: 1.3px; font-size: 10px; font-weight: 750; }
+		h1 { font: 700 clamp(26px, 4vw, 36px)/1.05 Georgia, serif; letter-spacing: 0; margin: 0; }
+		.month-label { border: 1px solid var(--line); background: var(--surface); padding: 10px 13px; border-radius: 8px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+		.summary-grid { display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+		.summary-card { min-height: 108px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+		.summary-card.total { color: white; background: var(--green); border-color: var(--green); position: relative; overflow: hidden; }
+		.summary-card.total:after { content: ""; position: absolute; right: -28px; top: -48px; width: 150px; height: 150px; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: 0 0 0 18px rgba(255,255,255,.035), 0 0 0 38px rgba(255,255,255,.025); }
+		.summary-label { color: var(--muted); font-size: 12px; font-weight: 650; }
+		.total .summary-label { color: rgba(255,255,255,.75); }
+		.summary-value { margin-top: 13px; font: 700 29px/1 Georgia, serif; letter-spacing: 0; }
+		.summary-icon { float: right; font-size: 20px; color: var(--green); background: var(--green-soft); border-radius: 9px; width: 34px; height: 34px; display: grid; place-items: center; }
+		.content-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(290px, .85fr); align-items: start; gap: 18px; }
+		.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+		.ledger { min-width: 0; }
+		.panel-head { padding: 20px 22px 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+		.panel-title { margin: 0; font: 700 20px/1.2 Georgia, serif; letter-spacing: 0; }
+		.panel-caption { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+		.tabs { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--line); padding: 0 22px; }
+		.tab { border: 0; background: none; color: var(--muted); padding: 11px 10px 12px; font-size: 13px; font-weight: 650; border-bottom: 2px solid transparent; }
+		.tab.active { color: var(--green); border-bottom-color: var(--green); }
+		.tab-count { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px; margin-left: 5px; border-radius: 10px; background: var(--gold-soft); color: #825b1e; font-size: 11px; }
+		.table-tools { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 22px; }
+		.search { width: min(230px, 58%); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; background: white; font-size: 12px; }
+		.filter-select { color: var(--muted); font-size: 12px; }
+		.table-scroll { overflow-x: auto; }
+		table { width: 100%; border-collapse: collapse; text-align: left; }
+		th { color: #89918c; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; font-weight: 750; padding: 10px 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); white-space: nowrap; }
+		th:first-child, td:first-child { padding-left: 22px; }
+		th:last-child, td:last-child { padding-right: 22px; }
+		td { border-bottom: 1px solid #eff0eb; padding: 13px 14px; font-size: 12px; white-space: nowrap; }
+		tr:last-child td { border-bottom: 0; }
+		.movement-name { font-weight: 700; font-size: 12px; color: var(--ink); }
+		.movement-meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+		.person-cell { display: flex; align-items: center; gap: 7px; }
+		.avatar { flex: 0 0 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: #e9eee8; color: #486454; font-size: 10px; font-weight: 750; }
+		.amount { font-variant-numeric: tabular-nums; font-weight: 750; text-align: right; }
+		.amount.income { color: var(--green); }
+		.amount.expense { color: var(--coral); }
+		.amount.transfer { color: #60706a; }
+		.status { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+		.status.approved { color: var(--green); background: var(--green-soft); }
+		.status.pending { color: #8a651f; background: var(--gold-soft); }
+		.row-actions { display: flex; gap: 5px; justify-content: end; }
+		.icon-btn { display: inline-grid; place-items: center; width: 29px; height: 29px; border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 6px; font-size: 14px; }
+		.icon-btn:hover { border-color: #9cb5a5; color: var(--green); }
+		.icon-btn.danger:hover { color: var(--coral); border-color: #e4b6a9; }
+		.empty-state { display: none; text-align: center; padding: 46px 20px; color: var(--muted); font-size: 13px; }
+		.empty-symbol { margin: 0 auto 12px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 19px; }
+		.side-column { display: grid; gap: 16px; }
+		.form-panel { padding: 21px; }
+		.form-heading { display: flex; justify-content: space-between; align-items: start; margin-bottom: 17px; }
+		.form-heading h2 { margin: 0; font: 700 20px/1.2 Georgia, serif; letter-spacing: 0; }
+		.form-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+		.type-switch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; background: #f0f1eb; border-radius: 7px; margin-bottom: 16px; }
+		.type-button { border: 0; color: var(--muted); background: transparent; border-radius: 5px; padding: 9px 3px; font-size: 11px; font-weight: 700; }
+		.type-button.active { background: white; color: var(--green); box-shadow: 0 1px 4px rgba(25,40,31,.1); }
+		.field { display: grid; gap: 6px; margin-bottom: 12px; }
+		.field label { color: #56615b; font-size: 11px; font-weight: 700; }
+		.field input, .field select, .field textarea { width: 100%; min-height: 39px; border: 1px solid #dfe2db; border-radius: 6px; background: white; padding: 9px 10px; font-size: 12px; outline: none; }
+		.field textarea { min-height: 66px; resize: vertical; }
+		.field input:focus, .field select:focus, .field textarea:focus, .search:focus { border-color: #82a893; box-shadow: 0 0 0 3px rgba(23,107,82,.09); }
+		.two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+		.submit-button { width: 100%; min-height: 43px; margin-top: 3px; border: 0; border-radius: 6px; color: white; background: var(--green); font-size: 13px; font-weight: 750; }
+		.submit-button:hover { background: #115b45; }
+		.approval-note { margin: 11px 0 0; text-align: center; color: var(--muted); font-size: 11px; line-height: 1.5; }
+		.moderation-panel { padding: 18px 20px; }
+		.moderation-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+		.moderation-title h2 { font: 700 17px Georgia, serif; letter-spacing: 0; margin: 0; }
+		.moderation-panel p { color: var(--muted); font-size: 12px; line-height: 1.55; margin: 9px 0 14px; }
+		.review-actions { display: flex; gap: 6px; }
+		.review-button { border: 0; border-radius: 5px; padding: 6px 9px; color: white; background: var(--green); font-size: 10px; font-weight: 700; }
+		.review-button.reject { color: #8b4032; background: var(--coral-soft); }
+		.toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); padding: 12px 18px; color: white; background: #243a31; border-radius: 7px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
+		.toast.show { opacity: 1; transform: translate(-50%, 0); }
+		.hidden { display: none !important; }
+		.auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 85% 10%, #e0ebe2 0, transparent 38%), var(--paper); }
+		.auth-stack { width: min(100%, 420px); }
+		.auth-panel { width: 100%; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); }
+		.auth-panel h1 { font: 700 27px/1.1 Georgia, serif; }
+		.auth-panel p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+		.auth-panel .field { margin-top: 14px; }
+		.auth-error { min-height: 20px; margin: 10px 0; color: var(--coral); font-size: 12px; }
+		.auth-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+		.text-button { border: 0; padding: 8px 0; color: var(--green); background: none; font-size: 12px; font-weight: 700; white-space: nowrap; }
+		.auth-note { padding: 11px 12px; border-radius: 6px; background: #edf3eb; color: #526653 !important; font-size: 11px !important; }
+		.access-queue { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--line); }
+		.access-queue h3 { display: flex; justify-content: space-between; margin: 0 0 10px; font: 700 14px Georgia, serif; }
+		.access-request-list { display: grid; gap: 8px; }
+		.access-request { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+		.access-request-name { font-size: 12px; font-weight: 700; }
+		.access-request-date { margin-top: 3px; color: var(--muted); font-size: 10px; }
+		.access-request-actions { display: flex; gap: 5px; }
+		.access-request-actions button { border: 0; border-radius: 5px; padding: 7px 8px; color: #fff; background: var(--green); font-size: 10px; font-weight: 700; }
+		.access-request-actions button.reject { color: #8b4032; background: var(--coral-soft); }
+		.member-report { margin-bottom: 22px; }
+		.member-report .panel-caption { margin-top: 5px; }
+		.member-name { font-weight: 750; }
+		.card-list { display: grid; gap: 3px; white-space: normal; min-width: 145px; }
+		.card-list span { color: var(--muted); font-size: 10px; }
+		.total-row td { background: #f5f7f2; font-weight: 750; }
+		.type-button { min-height: 38px; }
+		.account-label { color: var(--muted); font-size: 12px; }
+		.account-email { color: var(--ink); font-weight: 700; }
+		.signout-button { border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 6px; padding: 8px 10px; font-size: 11px; font-weight: 700; }
+		@media (max-width: 900px) { .content-grid { grid-template-columns: minmax(0, 1fr) minmax(270px, .8fr); gap: 12px; } .summary-grid { gap: 10px; } .summary-card { padding: 17px; } .panel-head, .tabs, .table-tools { padding-left: 16px; padding-right: 16px; } th:first-child, td:first-child { padding-left: 16px; } th:last-child, td:last-child { padding-right: 16px; } }
+		@media (max-width: 720px) { .shell { width: min(100% - 28px, 560px); } .topbar-inner { min-height: 65px; } .saved-state { display: none; } main { padding-top: 25px; } .intro { align-items: start; flex-direction: column; gap: 12px; } .month-label { align-self: start; } .summary-grid { grid-template-columns: 1fr 1fr; } .summary-card.total { grid-column: 1 / -1; min-height: 116px; } .summary-card { min-height: 106px; padding: 15px; } .summary-value { font-size: 25px; } .content-grid { grid-template-columns: 1fr; } .side-column { grid-row: 1; } .ledger { grid-row: 2; } }
+		@media (max-width: 420px) { .shell { width: calc(100% - 20px); } .brand-title { font-size: 16px; } .top-controls { gap: 5px; } .panel-head { align-items: start; } .panel-title { font-size: 18px; } .tabs { padding-left: 12px; padding-right: 12px; } .tab { padding-left: 6px; padding-right: 6px; font-size: 11px; } .table-tools { padding-left: 12px; padding-right: 12px; } .two-fields { gap: 7px; } }
+		@media (max-width: 720px) {
+			.summary-card:last-child { grid-column: 1 / -1; }
+			.member-report .table-scroll { overflow: visible; }
+			.member-report table, .member-report tbody { display: block; width: 100%; }
+			.member-report thead { display: none; }
+			.member-report tbody { padding: 0 12px 12px; }
+			.member-report tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+			.member-report tbody td { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 5px 8px !important; white-space: normal; text-align: left; }
+			.member-report tbody td::before { content: attr(data-label); color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+			.member-report tbody td:first-child { grid-column: 1 / -1; }
+			.member-report tbody tr.total-row { background: #f5f7f2; padding: 9px 0; }
+			.member-report tbody tr.total-row td { font-weight: 750; }
+		}
+	</style>
+</head>
+<body>
+	<section class="auth-gate" id="authGate">
+		<div class="auth-stack">
+			<form class="auth-panel" id="loginForm">
+				<div class="brand-mark" aria-hidden="true" style="margin-bottom:18px">+</div>
+				<p class="eyebrow">ACCESO FAMILIAR</p>
+				<h1>Fam Amador Arellano</h1>
+				<div class="field"><label for="loginIdentity">Usuario o correo</label><input id="loginIdentity" name="identity" type="text" autocomplete="username" required></div>
+				<div class="field"><label for="loginPassword">Contraseña</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
+				<div class="auth-error" id="authError" role="alert"></div>
+				<div class="auth-actions"><button class="submit-button" type="submit">Iniciar sesión</button><button class="text-button" id="resetPassword" type="button">Recuperar contraseña</button></div>
+				<button class="text-button" id="showSignup" type="button">Crear usuario familiar</button>
+				<p class="auth-note">Las cuentas nuevas requieren aprobación de Omi. Si olvidas la contraseña, tendrás que pedir ayuda; no se envían correos de recuperación.</p>
+			</form>
+			<form class="auth-panel hidden" id="signupForm">
+				<div class="brand-mark" aria-hidden="true" style="margin-bottom:18px">+</div>
+				<p class="eyebrow">Nueva cuenta</p>
+				<h1>Crear usuario</h1>
+				<div class="field"><label for="signupUsername">Nombre de usuario</label><input id="signupUsername" name="username" type="text" minlength="3" maxlength="25" pattern="[a-zA-Z0-9_-]+" autocomplete="username" autocapitalize="none" required placeholder="Ej. oamador"></div>
+				<div class="field"><label for="signupPassword">Contraseña (mínimo 6 caracteres)</label><input id="signupPassword" name="password" type="password" minlength="6" autocomplete="new-password" required></div>
+				<div class="auth-error" id="signupError" role="alert"></div>
+				<button class="submit-button" type="submit">Crear cuenta y pedir acceso</button>
+				<button class="text-button" id="showLogin" type="button">Ya tengo una cuenta</button>
+				<p class="auth-note">Firebase generará un correo interno para tu usuario. No sirve para recuperar contraseñas; si la olvidas, contacta a Omi.</p>
+			</form>
+			<section class="auth-panel hidden" id="pendingAccess">
+				<div class="brand-mark" aria-hidden="true" style="margin-bottom:18px">+</div>
+				<p class="eyebrow">Solicitud enviada</p>
+				<h1 id="pendingTitle">Esperando a Omi</h1>
+				<p id="pendingMessage">Tu cuenta no podrá consultar los movimientos hasta ser aprobada.</p>
+				<button class="signout-button" id="signOutPending" type="button">Cerrar sesión</button>
+			</section>
+		</div>
+	</section>
+	<div id="appShell" class="hidden">
+	<header class="topbar">
+		<div class="shell topbar-inner">
+			<div class="brand">
+				<div class="brand-mark" aria-hidden="true">+</div>
+				<p class="brand-title">Fam Amador Arellano</p>
+			</div>
+			<div class="top-controls">
+				<div class="saved-state" id="syncState"><span class="saved-dot"></span>Sincronizando</div>
+				<div class="account-label"><span class="account-email" id="signedInEmail"></span></div>
+				<button class="signout-button" id="signOutButton" type="button">Cerrar sesión</button>
+			</div>
+		</div>
+	</header>
+	<main class="shell">
+		<section class="intro">
+			<h1>Resumen</h1>
+			<div class="month-label" id="currentMonth"></div>
+		</section>
+		<section class="summary-grid" aria-label="Resumen de saldos">
+			<article class="summary-card total"><span class="summary-label">Disponible total</span><div class="summary-value" id="totalBalance">$0.00</div></article>
+			<article class="summary-card"><span class="summary-icon" aria-hidden="true">▤</span><span class="summary-label">Efectivo</span><div class="summary-value" id="cashBalance">$0.00</div></article>
+			<article class="summary-card"><span class="summary-icon" aria-hidden="true">⌂</span><span class="summary-label">Banco</span><div class="summary-value" id="bankBalance">$0.00</div></article>
+			<article class="summary-card"><span class="summary-icon" aria-hidden="true" style="color:var(--coral);background:var(--coral-soft)">−</span><span class="summary-label">Gastos del mes</span><div class="summary-value" id="monthlyExpenses">$0.00</div></article>
+		</section>
+		<section class="panel member-report hidden" id="memberReport">
+			<div class="panel-head"><div><h2 class="panel-title">Saldo por familiar</h2></div></div>
+			<div class="table-scroll"><table><thead><tr><th>Familiar</th><th>Efectivo</th><th>Banco</th><th>Tarjetas por pagar</th><th>Gastos pagados</th></tr></thead><tbody id="memberRows"></tbody></table></div>
+		</section>
+		<section class="content-grid">
+			<div class="panel ledger">
+				<div class="panel-head"><div><h2 class="panel-title">Movimientos</h2><p class="panel-caption" id="movementCaption">Movimientos aprobados</p></div><button class="icon-btn" id="exportButton" title="Descargar movimientos CSV" aria-label="Descargar movimientos CSV">↓</button></div>
+				<div class="tabs" role="tablist" aria-label="Filtrar movimientos">
+					<button class="tab active" data-tab="approved" role="tab" aria-selected="true">Aprobados</button>
+					<button class="tab" data-tab="pending" role="tab" aria-selected="false">Por revisar <span class="tab-count" id="pendingCount">0</span></button>
+					<button class="tab" data-tab="all" role="tab" aria-selected="false">Todos</button>
+				</div>
+				<div class="table-tools"><input class="search" id="searchInput" type="search" placeholder="Buscar movimiento..." aria-label="Buscar movimiento"><select class="filter-select" id="personFilter" aria-label="Filtrar por persona"><option value="">Todas las personas</option></select></div>
+				<div class="table-scroll">
+					<table><thead><tr><th>Movimiento</th><th>Persona</th><th>Fecha</th><th>Estado</th><th style="text-align:right">Importe</th><th></th></tr></thead><tbody id="movementRows"></tbody></table>
+					<div class="empty-state" id="emptyState"><div class="empty-symbol">＋</div><strong id="emptyTitle">Aún no hay movimientos</strong><div id="emptyCopy" style="margin-top:6px">Agrega el primer ingreso o gasto para comenzar.</div></div>
+				</div>
+			</div>
+			<aside class="side-column">
+				<section class="panel form-panel">
+						<div class="form-heading"><div><h2 id="formTitle">Nuevo movimiento</h2></div></div>
+					<form id="movementForm">
+						<div class="type-switch" role="group" aria-label="Tipo de movimiento">
+							<button class="type-button active" type="button" data-type="income">Ingreso</button><button class="type-button" type="button" data-type="expense">Gasto</button><button class="type-button" type="button" data-type="transfer">Traspaso</button><button class="type-button" type="button" data-type="cardPayment">Pago tarjeta</button>
+						</div>
+						<div class="field"><label for="description">Concepto</label><input id="description" name="description" required maxlength="70" placeholder="Ej. Pago de abogado"></div>
+						<div class="field"><label for="amount">Importe</label><input id="amount" name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></div>
+						<div class="two-fields">
+							<div class="field" id="accountField"><label for="account">Cuenta</label><select id="account" name="account"><option value="cash">Efectivo</option><option value="bank">Banco</option></select></div>
+							<div class="field hidden" id="destinationField"><label for="destination">Hacia</label><select id="destination" name="destination"><option value="bank">Banco</option><option value="cash">Efectivo</option></select></div>
+							<div class="field hidden" id="recipientField"><label for="recipient">Hacia familiar</label><select id="recipient" name="recipient"></select></div>
+							<div class="field" id="categoryField"><label for="category">Categoría</label><select id="category" name="category"><option>General</option><option>Viaje</option><option>Viáticos</option><option>Abogados</option><option>Alimentos</option><option>Transporte</option><option>Salud</option><option>Hogar</option><option>Otro</option></select></div>
+						</div>
+						<div class="two-fields">
+							<div class="field hidden" id="paymentMethodField"><label for="paymentMethod">Se pagó con</label><select id="paymentMethod" name="paymentMethod"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="debit">Tarjeta de débito</option><option value="credit">Tarjeta de crédito</option></select></div>
+							<div class="field hidden" id="cardNameField"><label for="cardName">¿Qué tarjeta?</label><input id="cardName" name="cardName" maxlength="40" placeholder="Ej. Visa terminación 1234"></div>
+						</div>
+						<div class="two-fields">
+							  <div class="field"><label id="personLabel" for="person">¿Quién lo registra?</label><select id="person" name="person"></select></div>
+							<div class="field"><label for="date">Fecha</label><input id="date" name="date" type="date" required></div>
+						</div>
+						<div class="field"><label for="notes">Referencia (opcional)</label><textarea id="notes" name="notes" maxlength="180" placeholder="Folio o detalle breve"></textarea></div>
+						<button class="submit-button" id="submitButton" type="submit">Agregar movimiento</button>
+						<p class="approval-note" id="approvalNote"></p>
+					</form>
+				</section>
+				<section class="panel moderation-panel" id="moderationPanel">
+					<div class="moderation-title"><h2>Solicitudes de acceso</h2><span class="status pending" id="modeBadge">Omi</span></div>
+					<div class="access-queue hidden" id="accessQueue">
+						<h3>Pendientes <span class="tab-count" id="accessRequestCount">0</span></h3>
+						<div class="access-request-list" id="accessRequestList"></div>
+					</div>
+				</section>
+			</aside>
+		</section>
+	</main>
+	<div class="toast" id="toast" role="status" aria-live="polite"></div>
+	</div>
+	<script type="module">
+		import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+		import { getDatabase, ref, onValue, get, push, set, update, remove } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+
+			const PEOPLE = ['Natividad', 'Lizeth', 'José Luis', 'Diana', 'Carlos', 'Omi'];
+			const MODERATOR_UID = 'DkPwbLpWU1MePIzFPpXXPJwZcAK2';
+			const GENERATED_EMAIL_DOMAIN = 'gastos-869f7.firebaseapp.com';
+			const firebaseConfig = {
+				apiKey: 'AIzaSyALsCR6mZZP8d9ARsUdnbe8bX_qGH49Sp0',
+				authDomain: 'gastos-869f7.firebaseapp.com',
+				databaseURL: 'https://gastos-869f7-default-rtdb.firebaseio.com',
+				projectId: 'gastos-869f7',
+				storageBucket: 'gastos-869f7.firebasestorage.app',
+				messagingSenderId: '166320580784',
+				appId: '1:166320580784:web:760fa131f2aad0a2ddf375',
+				measurementId: 'G-B9TMEWG8F0'
+			};
+			const app = initializeApp(firebaseConfig);
+			const auth = getAuth(app);
+			const database = getDatabase(app);
+			const today = localDate();
+			const state = { movements: [], accessRequests: [] };
+			let authUser = null;
+			let activeUsername = '';
+			let activeAppUid = null;
+			let stopMovementsListener = null;
+			let stopMembersListener = null;
+			let stopAccessRequestListener = null;
+			let stopQueueListener = null;
+			let currentType = 'income';
+			let activeTab = 'approved';
+			let toastTimer;
+
+			function localDate(date = new Date()) {
+				return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+			}
+			function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
+			function money(value) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value || 0); }
+			function accountName(account) { return account === 'bank' ? 'Banco' : account === 'credit' ? 'Crédito' : 'Efectivo'; }
+			function initials(name) { return name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(); }
+			function normalizeUsername(value) { return String(value || '').trim().toLowerCase(); }
+			function usernameFromUser(user) {
+				const email = String(user?.email || '');
+				return normalizeUsername(email.split('@')[0]).replace(/[^a-z0-9_-]/g, '-').slice(0, 25) || 'familiar';
+			}
+			function authEmailFromIdentity(identity) {
+				const value = String(identity || '').trim();
+				return value.includes('@') ? value.toLowerCase() : `${normalizeUsername(value)}@${GENERATED_EMAIL_DOMAIN}`;
+			}
+			function populatePeople() {
+				const options = PEOPLE.map(person => `<option value="${escapeHtml(person)}">${escapeHtml(person)}</option>`).join('');
+				document.querySelector('#person').innerHTML = options;
+				document.querySelector('#recipient').innerHTML = options;
+				document.querySelector('#personFilter').innerHTML = '<option value="">Todas las personas</option>' + options;
+				document.querySelector('#person').value = PEOPLE[0];
+				document.querySelector('#recipient').value = PEOPLE[0];
+			}
+			function isModerator(user = authUser) { return Boolean(user && user.uid === MODERATOR_UID); }
+			function calculateBalances() {
+				const approved = state.movements.filter(item => item.status === 'approved');
+				let cash = 0;
+				let bank = 0;
+				approved.forEach(item => {
+					if (item.type === 'income') item.account === 'cash' ? cash += item.amount : bank += item.amount;
+					if (item.type === 'expense' && item.account !== 'credit') item.account === 'cash' ? cash -= item.amount : bank -= item.amount;
+					if (item.type === 'transfer') {
+						item.account === 'cash' ? cash -= item.amount : bank -= item.amount;
+						item.destination === 'cash' ? cash += item.amount : bank += item.amount;
+					}
+					if (item.type === 'cardPayment') item.account === 'cash' ? cash -= item.amount : bank -= item.amount;
+				});
+				return { cash, bank };
+			}
+			function calculateMemberBalances() {
+				const members = Object.fromEntries(PEOPLE.map(person => [person, { cash: 0, bank: 0, spent: 0, cardCharges: {} }]));
+				const cardPayments = {};
+				state.movements.filter(item => item.status === 'approved').forEach(item => {
+					const member = members[item.person];
+					const amount = Number(item.amount) || 0;
+					if (item.type === 'income' && member) member[item.account] += amount;
+					if (item.type === 'expense' && member) {
+						member.spent += amount;
+						if (item.account === 'credit') {
+							const cardName = String(item.cardName || 'Tarjeta sin nombre').trim();
+						member.cardCharges[cardName] = (member.cardCharges[cardName] || 0) + amount;
+						} else member[item.account] -= amount;
+					}
+					if (item.type === 'transfer') {
+						const sender = members[item.person];
+						const recipient = members[item.recipient || item.person];
+						if (sender) sender[item.account] -= amount;
+						if (recipient) recipient[item.destination] += amount;
+					}
+					if (item.type === 'cardPayment') {
+						if (member) member[item.account] -= amount;
+						const cardName = String(item.cardName || 'Tarjeta sin nombre').trim();
+						cardPayments[cardName] = (cardPayments[cardName] || 0) + amount;
+					}
+				});
+				const cardTotals = {};
+				Object.values(members).forEach(member => Object.entries(member.cardCharges).forEach(([cardName, amount]) => {
+					cardTotals[cardName] = (cardTotals[cardName] || 0) + amount;
+				}));
+				Object.entries(cardTotals).forEach(([cardName, charges]) => {
+					const outstanding = Math.max(0, charges - (cardPayments[cardName] || 0));
+					Object.values(members).forEach(member => {
+						const share = member.cardCharges[cardName] || 0;
+						if (share) member.cardCharges[cardName] = charges ? share * outstanding / charges : 0;
+					});
+				});
+				return members;
+			}
+			function renderMemberReport() {
+				const members = calculateMemberBalances();
+				const totals = { cash: 0, bank: 0, cards: 0, spent: 0 };
+				const rows = PEOPLE.map(person => {
+					const member = members[person];
+					const cards = Object.entries(member.cardCharges).filter(([, amount]) => amount > 0.005);
+					const cardTotal = cards.reduce((sum, [, amount]) => sum + amount, 0);
+					totals.cash += member.cash;
+					totals.bank += member.bank;
+					totals.cards += cardTotal;
+					totals.spent += member.spent;
+					const cardDetails = cards.length ? cards.map(([name, amount]) => `<span>${escapeHtml(name)}: ${money(amount)}</span>`).join('') : '<span>Sin saldo pendiente</span>';
+					return `<tr><td class="member-name" data-label="Familiar">${escapeHtml(person)}</td><td class="amount" data-label="Efectivo">${money(member.cash)}</td><td class="amount" data-label="Banco">${money(member.bank)}</td><td data-label="Tarjetas por pagar"><div class="card-list">${cardDetails}</div></td><td class="amount expense" data-label="Gastos pagados">${money(member.spent)}</td></tr>`;
+				});
+				document.querySelector('#memberRows').innerHTML = `${rows.join('')}<tr class="total-row"><td data-label="Totales">Total</td><td class="amount" data-label="Efectivo">${money(totals.cash)}</td><td class="amount" data-label="Banco">${money(totals.bank)}</td><td class="amount" data-label="Tarjetas">${money(totals.cards)}</td><td class="amount" data-label="Gastos">${money(totals.spent)}</td></tr>`;
+			}
+			function updateSummary() {
+				const balances = calculateBalances();
+				document.querySelector('#cashBalance').textContent = money(balances.cash);
+				document.querySelector('#bankBalance').textContent = money(balances.bank);
+				document.querySelector('#totalBalance').textContent = money(balances.cash + balances.bank);
+				const monthKey = today.slice(0, 7);
+				const monthlyExpenses = state.movements.filter(item => item.status === 'approved' && item.type === 'expense' && item.date.startsWith(monthKey)).reduce((total, item) => total + item.amount, 0);
+				document.querySelector('#monthlyExpenses').textContent = money(monthlyExpenses);
+				document.querySelector('#pendingCount').textContent = state.movements.filter(item => item.status === 'pending').length;
+				const month = new Date().toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+				document.querySelector('#currentMonth').textContent = month.charAt(0).toUpperCase() + month.slice(1);
+				renderMemberReport();
+			}
+			function visibleMovements() {
+				const query = document.querySelector('#searchInput').value.trim().toLocaleLowerCase('es-MX');
+				const person = document.querySelector('#personFilter').value;
+				return state.movements.filter(item => {
+					const tabMatch = activeTab === 'all' || item.status === activeTab;
+					const personMatch = !person || item.person === person;
+					const queryMatch = !query || [item.description, item.category, item.person, item.notes].join(' ').toLocaleLowerCase('es-MX').includes(query);
+					return tabMatch && personMatch && queryMatch;
+				}).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+			}
+			function renderRows() {
+				const rows = visibleMovements();
+				const tbody = document.querySelector('#movementRows');
+				const canModerate = isModerator();
+				tbody.innerHTML = rows.map(item => {
+					const typeLabel = item.type === 'income' ? 'Ingreso' : item.type === 'expense' ? 'Gasto' : item.type === 'cardPayment' ? `Pago de tarjeta · ${escapeHtml(item.cardName || 'Tarjeta')}` : `Traspaso · ${accountName(item.account)} a ${accountName(item.destination)}`;
+					const amountClass = item.type === 'income' ? 'income' : item.type === 'transfer' || item.type === 'cardPayment' ? 'transfer' : 'expense';
+					const amountPrefix = item.type === 'income' ? '+' : item.type === 'expense' ? '−' : item.type === 'cardPayment' ? '↘' : '↔';
+					const status = item.status === 'approved' ? '<span class="status approved">Aprobado</span>' : '<span class="status pending">Por revisar</span>';
+					const review = item.status === 'pending' && canModerate ? `<span class="review-actions"><button class="review-button" data-action="approve" data-id="${escapeHtml(item.id)}">Aprobar</button><button class="review-button reject" data-action="reject" data-id="${escapeHtml(item.id)}">Rechazar</button></span>` : '';
+					const remove = canModerate || (item.createdBy === authUser?.uid && item.status === 'pending') ? `<button class="icon-btn danger" data-action="delete" data-id="${escapeHtml(item.id)}" aria-label="Eliminar movimiento" title="Eliminar">×</button>` : '';
+					const note = item.notes ? ` · ${escapeHtml(item.notes)}` : '';
+					const creator = item.submittedBy ? ` · Capturado por ${escapeHtml(item.submittedBy)}` : '';
+					const payment = item.type === 'expense' ? ` · ${item.paymentMethod === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : item.paymentMethod === 'debit' ? 'Tarjeta de débito' : item.paymentMethod === 'transfer' ? 'Transferencia' : item.account === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : 'Efectivo'}` : item.type === 'cardPayment' ? ` · desde ${accountName(item.account)}` : '';
+					const recipient = item.type === 'transfer' && item.recipient && item.recipient !== item.person ? ` · para ${escapeHtml(item.recipient)}` : '';
+					const category = item.type === 'cardPayment' ? 'Abono a tarjeta' : item.category || 'General';
+					return `<tr><td><div class="movement-name">${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${remove}</div></td></tr>`;
+				}).join('');
+				const empty = rows.length === 0;
+				document.querySelector('.table-scroll table').classList.toggle('hidden', empty);
+				document.querySelector('#emptyState').style.display = empty ? 'block' : 'none';
+				document.querySelector('#emptyTitle').textContent = activeTab === 'pending' ? 'No hay movimientos por revisar' : 'Aún no hay movimientos';
+				document.querySelector('#emptyCopy').textContent = activeTab === 'pending' ? 'Cuando alguien proponga un movimiento, aparecerá aquí.' : 'Agrega el primer ingreso o gasto para comenzar.';
+				document.querySelector('#movementCaption').textContent = `${state.movements.filter(item => item.status === 'approved').length} aprobados`;
+			}
+			function updatePermissions() {
+				const moderator = isModerator();
+				document.querySelector('#memberReport').classList.toggle('hidden', !moderator);
+				document.querySelector('#moderationPanel').classList.toggle('hidden', !moderator);
+				document.querySelector('#approvalNote').textContent = moderator ? 'Tus movimientos se agregan directamente al saldo.' : 'Tu movimiento quedará pendiente de aprobación.';
+				document.querySelector('#submitButton').textContent = moderator ? 'Agregar movimiento' : 'Enviar a revisión';
+				document.querySelector('#modeBadge').textContent = 'Omi';
+				renderRows();
+				renderAccessRequests();
+			}
+			function renderAccessRequests() {
+				const queue = document.querySelector('#accessQueue');
+				queue.classList.toggle('hidden', !isModerator());
+				if (!isModerator()) return;
+				const pending = state.accessRequests.filter(request => request.status === 'pending').sort((a, b) => a.requestedAt - b.requestedAt);
+				document.querySelector('#accessRequestCount').textContent = pending.length;
+				document.querySelector('#accessRequestList').innerHTML = pending.length ? pending.map(request => `<div class="access-request"><div><div class="access-request-name">${escapeHtml(request.username)}</div><div class="access-request-date">Solicitó acceso ${new Date(request.requestedAt).toLocaleDateString('es-MX')}</div></div><div class="access-request-actions"><button data-access="approve" data-uid="${escapeHtml(request.uid)}">Aprobar</button><button class="reject" data-access="reject" data-uid="${escapeHtml(request.uid)}">Rechazar</button></div></div>`).join('') : '<span class="panel-caption">No hay solicitudes nuevas.</span>';
+			}
+			function render() { updateSummary(); updatePermissions(); }
+			function showToast(message) {
+				const toast = document.querySelector('#toast');
+				toast.textContent = message;
+				toast.classList.add('show');
+				clearTimeout(toastTimer);
+				toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+			}
+			function setType(type) {
+				currentType = type;
+				document.querySelectorAll('.type-button').forEach(button => button.classList.toggle('active', button.dataset.type === type));
+				const isTransfer = type === 'transfer';
+				const isExpense = type === 'expense';
+				const isCardPayment = type === 'cardPayment';
+				document.querySelector('#categoryField').classList.toggle('hidden', isTransfer || isCardPayment);
+				document.querySelector('#destinationField').classList.toggle('hidden', !isTransfer);
+				document.querySelector('#recipientField').classList.toggle('hidden', !isTransfer);
+				document.querySelector('#paymentMethodField').classList.toggle('hidden', !isExpense);
+				document.querySelector('#accountField').classList.toggle('hidden', isExpense);
+				document.querySelector('#personLabel').textContent = isExpense ? '¿Quién pagó?' : isTransfer ? '¿De quién sale el dinero?' : isCardPayment ? '¿Quién pagó la tarjeta?' : '¿Quién recibe/guarda el dinero?';
+				document.querySelector('#account').innerHTML = isTransfer || isCardPayment ? '<option value="cash">Desde efectivo</option><option value="bank">Desde banco</option>' : '<option value="cash">Efectivo</option><option value="bank">Banco</option>';
+				if (isTransfer) {
+					document.querySelector('#destination').value = 'bank';
+					document.querySelector('#recipient').value = document.querySelector('#person').value;
+				}
+				if (isExpense) updateExpensePaymentFields();
+				else {
+					document.querySelector('#cardNameField').classList.toggle('hidden', !isCardPayment);
+					document.querySelector('#cardName').required = isCardPayment;
+				}
+			}
+			function updateExpensePaymentFields() {
+				const paymentMethod = document.querySelector('#paymentMethod').value;
+				const sourceAccount = paymentMethod === 'cash' ? 'cash' : 'bank';
+				document.querySelector('#account').value = sourceAccount;
+				const usesCredit = paymentMethod === 'credit';
+				document.querySelector('#cardNameField').classList.toggle('hidden', !usesCredit);
+				document.querySelector('#cardName').required = usesCredit;
+			}
+			document.querySelectorAll('.type-button').forEach(button => button.addEventListener('click', () => setType(button.dataset.type)));
+			document.querySelector('#paymentMethod').addEventListener('change', updateExpensePaymentFields);
+			document.querySelectorAll('.tab').forEach(button => button.addEventListener('click', () => {
+				activeTab = button.dataset.tab;
+				document.querySelectorAll('.tab').forEach(tab => { const active = tab === button; tab.classList.toggle('active', active); tab.setAttribute('aria-selected', String(active)); });
+				renderRows();
+			}));
+			document.querySelector('#searchInput').addEventListener('input', renderRows);
+			document.querySelector('#personFilter').addEventListener('change', renderRows);
+			document.querySelector('#movementForm').addEventListener('submit', async event => {
+				event.preventDefault();
+				const movementForm = event.currentTarget;
+				const form = new FormData(movementForm);
+				const amount = Number(form.get('amount'));
+				const paymentMethod = currentType === 'expense' ? String(form.get('paymentMethod')) : '';
+				const account = currentType === 'expense' ? paymentMethod === 'cash' ? 'cash' : paymentMethod === 'credit' ? 'credit' : 'bank' : String(form.get('account'));
+				const destination = form.get('destination');
+				const cardName = String(form.get('cardName') || '').trim();
+				const recipient = String(form.get('recipient') || form.get('person'));
+				if (!Number.isFinite(amount) || amount <= 0) { showToast('Escribe un importe válido.'); return; }
+				if (currentType === 'transfer' && account === destination && recipient === String(form.get('person'))) { showToast('El traspaso necesita cambiar de cuenta o de familiar.'); return; }
+				if ((currentType === 'cardPayment' || paymentMethod === 'credit') && !cardName) { showToast('Escribe el nombre de la tarjeta.'); return; }
+				const newMovementRef = push(ref(database, 'movements'));
+				const movement = {
+					id: newMovementRef.key,
+					type: currentType,
+					description: String(form.get('description')).trim(),
+					amount,
+					account,
+					destination: currentType === 'transfer' ? destination : '',
+					recipient: currentType === 'transfer' ? recipient : '',
+					paymentMethod,
+					cardName: currentType === 'cardPayment' || paymentMethod === 'credit' ? cardName : '',
+					category: currentType === 'transfer' ? 'Traspaso' : currentType === 'cardPayment' ? 'Abono a tarjeta' : String(form.get('category')),
+					person: String(form.get('person')),
+					createdBy: authUser.uid,
+					submittedBy: activeUsername || usernameFromUser(authUser),
+					date: String(form.get('date')),
+					notes: String(form.get('notes')).trim(),
+					status: isModerator() ? 'approved' : 'pending',
+					createdAt: Date.now()
+				};
+				document.querySelector('#submitButton').disabled = true;
+				try {
+					await set(newMovementRef, movement);
+					movementForm.reset();
+					document.querySelector('#date').value = today;
+					document.querySelector('#person').value = PEOPLE[0];
+						document.querySelector('#recipient').value = PEOPLE[0];
+						setType(currentType);
+					activeTab = movement.status === 'pending' ? 'pending' : 'approved';
+					document.querySelector(`.tab[data-tab="${activeTab}"]`).click();
+					showToast(movement.status === 'approved' ? 'Movimiento agregado al saldo.' : 'Movimiento enviado para revisión.');
+				} catch (error) { showToast(firebaseErrorMessage(error)); }
+				finally { document.querySelector('#submitButton').disabled = false; }
+			});
+			document.querySelector('#movementRows').addEventListener('click', async event => {
+				const button = event.target.closest('button[data-action]');
+				if (!button) return;
+				const movement = state.movements.find(item => item.id === button.dataset.id);
+				if (!movement) return;
+				const movementRef = ref(database, `movements/${movement.id}`);
+				try {
+				if (button.dataset.action === 'approve' && isModerator()) {
+					await update(movementRef, { status: 'approved', reviewedBy: authUser.email || authUser.uid, reviewedAt: Date.now() });
+					showToast('Movimiento aprobado; el saldo ya está actualizado.');
+				} else if (button.dataset.action === 'reject' && isModerator()) {
+					await remove(movementRef);
+					showToast('Propuesta rechazada y eliminada.');
+				} else if (button.dataset.action === 'delete' && (isModerator() || (movement.createdBy === authUser.uid && movement.status === 'pending'))) {
+					if (!confirm('¿Eliminar este movimiento?')) return;
+					await remove(movementRef);
+					showToast('Movimiento eliminado.');
+				} else return;
+				} catch (error) { showToast(firebaseErrorMessage(error)); }
+			});
+			document.querySelector('#exportButton').addEventListener('click', () => {
+				const rows = [['Fecha', 'Tipo', 'Concepto', 'Categoría', 'Responsable', 'Hacia familiar', 'Cuenta', 'Método de pago', 'Tarjeta', 'Destino', 'Importe', 'Estado', 'Nota'], ...state.movements.map(item => [item.date, item.type, item.description, item.category, item.person, item.recipient || '', accountName(item.account), item.paymentMethod || '', item.cardName || '', item.destination ? accountName(item.destination) : '', item.amount, item.status, item.notes || ''])];
+				const csv = '\ufeff' + rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+				const link = document.createElement('a');
+				link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+				link.download = 'movimientos-familiares.csv';
+				link.click();
+				URL.revokeObjectURL(link.href);
+			});
+			function firebaseErrorMessage(error) {
+				const code = error?.code || '';
+				if (code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials' || code === 'auth/user-not-found' || code === 'auth/wrong-password') return 'Correo o contraseña incorrectos.';
+				if (code === 'auth/email-already-in-use') return 'Ese usuario ya tiene cuenta. Inicia sesión con el alias y la contraseña que elegiste.';
+				if (code === 'auth/weak-password') return 'Usa una contraseña de al menos 6 caracteres.';
+				if (code === 'username-taken') return 'Ese nombre de usuario ya está ocupado. Prueba con otro.';
+				if (code === 'auth/operation-not-allowed' || code === 'auth/configuration-not-found') return 'Activa Email/Password en Firebase Console > Authentication > Sign-in method.';
+				if (code === 'auth/unauthorized-domain') return 'Agrega este dominio en Firebase Authentication > Dominios autorizados.';
+				if (code === 'PERMISSION_DENIED' || code === 'permission_denied') return 'Firebase rechazó la operación. Publica database.rules.json y verifica que el usuario tenga acceso aprobado.';
+				return error?.message || 'No se pudo conectar con Firebase.';
+			}
+			function showAuthView(view) {
+				document.querySelector('#authGate').classList.remove('hidden');
+				document.querySelector('#appShell').classList.add('hidden');
+				document.querySelector('#loginForm').classList.toggle('hidden', view !== 'login');
+				document.querySelector('#signupForm').classList.toggle('hidden', view !== 'signup');
+				document.querySelector('#pendingAccess').classList.toggle('hidden', view !== 'pending');
+			}
+			function stopPrivateListeners() {
+				[stopMovementsListener, stopMembersListener, stopAccessRequestListener, stopQueueListener].forEach(stop => { if (stop) stop(); });
+				stopMovementsListener = null;
+				stopMembersListener = null;
+				stopAccessRequestListener = null;
+				stopQueueListener = null;
+			}
+			function showAccessPending(member, errorMessage = '') {
+				activeAppUid = null;
+				state.movements = [];
+				state.accessRequests = [];
+				showAuthView('pending');
+				const rejected = member?.status === 'rejected';
+				document.querySelector('#pendingTitle').textContent = rejected ? 'Solicitud no aprobada' : 'Esperando a Omi';
+				document.querySelector('#pendingMessage').textContent = errorMessage || (rejected ? 'Omi no aprobó esta solicitud. Contacta a Omi para revisar el acceso.' : 'Tu solicitud fue enviada. No podrás consultar los movimientos hasta que Omi la apruebe.');
+			}
+			function startAuthorizedApp(user, member) {
+				activeUsername = member?.username || (isModerator(user) ? 'Omi' : usernameFromUser(user));
+				if (activeAppUid === user.uid) return;
+				activeAppUid = user.uid;
+				document.querySelector('#authGate').classList.add('hidden');
+				document.querySelector('#appShell').classList.remove('hidden');
+				document.querySelector('#signedInEmail').textContent = activeUsername;
+				document.querySelector('#person').value = isModerator(user) ? 'Omi' : PEOPLE[0];
+				setSyncStatus('Conectando…');
+				render();
+				if (!stopMovementsListener) {
+					stopMovementsListener = onValue(ref(database, 'movements'), snapshot => {
+						const records = snapshot.val() || {};
+						state.movements = Object.entries(records).map(([id, movement]) => ({ ...movement, id }));
+						setSyncStatus('Sincronizado', true);
+						render();
+					}, error => { setSyncStatus('Error de conexión'); showToast(firebaseErrorMessage(error)); });
+				}
+				if (isModerator(user) && !stopQueueListener) {
+					stopQueueListener = onValue(ref(database, 'members'), snapshot => {
+						const members = snapshot.val() || {};
+						state.accessRequests = Object.entries(members).map(([uid, profile]) => ({ ...profile, uid })).filter(profile => profile.status === 'pending');
+						renderAccessRequests();
+					}, error => showToast(firebaseErrorMessage(error)));
+				}
+			}
+			function setSyncStatus(text, connected = false) {
+				document.querySelector('#syncState').innerHTML = `<span class="saved-dot" style="background:${connected ? '#5d9c73' : '#b68032'}"></span>${escapeHtml(text)}`;
+			}
+			document.querySelector('#loginForm').addEventListener('submit', async event => {
+				event.preventDefault();
+				const form = new FormData(event.currentTarget);
+				document.querySelector('#authError').textContent = '';
+				try { await signInWithEmailAndPassword(auth, authEmailFromIdentity(form.get('identity')), String(form.get('password'))); }
+				catch (error) { document.querySelector('#authError').textContent = firebaseErrorMessage(error); }
+			});
+			document.querySelector('#showSignup').addEventListener('click', () => showAuthView('signup'));
+			document.querySelector('#showLogin').addEventListener('click', () => showAuthView('login'));
+			document.querySelector('#signupForm').addEventListener('submit', async event => {
+				event.preventDefault();
+				const form = new FormData(event.currentTarget);
+				const username = normalizeUsername(form.get('username'));
+				const password = String(form.get('password'));
+				const errorBox = document.querySelector('#signupError');
+				const submit = event.currentTarget.querySelector('button[type="submit"]');
+				errorBox.textContent = '';
+				if (!/^[a-z0-9_-]{3,25}$/.test(username)) { errorBox.textContent = 'Usa de 3 a 25 letras, números, guiones o guiones bajos.'; return; }
+				if (['natividad', 'lizeth', 'joseluis', 'diana', 'carlos', 'omi'].includes(username)) { errorBox.textContent = 'Ese nombre está reservado para identificar a un familiar.'; return; }
+				submit.disabled = true;
+				try {
+					await createUserWithEmailAndPassword(auth, authEmailFromIdentity(username), password);
+					showToast('Cuenta creada. Enviando la solicitud a Omi…');
+				} catch (error) { errorBox.textContent = firebaseErrorMessage(error); }
+				finally { submit.disabled = false; }
+			});
+			document.querySelector('#resetPassword').addEventListener('click', async () => {
+				const identity = document.querySelector('#loginIdentity').value.trim();
+				if (!identity.includes('@')) { document.querySelector('#authError').textContent = 'Los usuarios nuevos no tienen un buzón real. Si olvidaste tu contraseña, contacta a Omi.'; return; }
+				try { await sendPasswordResetEmail(auth, identity.toLowerCase()); document.querySelector('#authError').textContent = 'Si existe una cuenta con ese correo, recibirá un enlace para recuperar la contraseña.'; }
+				catch (error) { document.querySelector('#authError').textContent = firebaseErrorMessage(error); }
+			});
+			document.querySelector('#signOutButton').addEventListener('click', () => signOut(auth));
+			document.querySelector('#signOutPending').addEventListener('click', () => signOut(auth));
+			document.querySelector('#accessRequestList').addEventListener('click', async event => {
+				const button = event.target.closest('button[data-access]');
+				if (!button || !isModerator()) return;
+				const uid = button.dataset.uid;
+				const status = button.dataset.access === 'approve' ? 'approved' : 'rejected';
+				button.disabled = true;
+				try {
+					await update(ref(database, `members/${uid}`), { status, reviewedBy: authUser.uid, reviewedAt: Date.now() });
+					showToast(status === 'approved' ? 'Usuario aprobado; ya puede iniciar sesión.' : 'Solicitud rechazada.');
+				} catch (error) { showToast(firebaseErrorMessage(error)); button.disabled = false; }
+			});
+			populatePeople();
+			document.querySelector('#date').value = today;
+			document.querySelector('#currentMonth').textContent = new Date().toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }).replace(/^./, char => char.toUpperCase());
+			onAuthStateChanged(auth, user => {
+				stopPrivateListeners();
+				authUser = user;
+				activeAppUid = null;
+				state.movements = [];
+				state.accessRequests = [];
+				if (!user) { showAuthView('login'); return; }
+				if (isModerator(user)) { startAuthorizedApp(user, { username: 'Omi' }); return; }
+				let requestCreated = false;
+				stopAccessRequestListener = onValue(ref(database, `members/${user.uid}`), snapshot => {
+					const member = snapshot.val();
+					if (member?.status === 'approved') { startAuthorizedApp(user, member); return; }
+					showAccessPending(member || { status: 'pending' });
+					if (!member && !requestCreated) {
+						requestCreated = true;
+						const username = usernameFromUser(user);
+						const profile = { uid: user.uid, username, status: 'pending', requestedAt: Date.now() };
+						const generatedAccount = String(user.email || '').endsWith(`@${GENERATED_EMAIL_DOMAIN}`);
+						const saveRequest = async () => {
+							const changes = { [`members/${user.uid}`]: profile };
+							if (generatedAccount) {
+								const usernameSnapshot = await get(ref(database, `usernames/${username}`));
+								if (usernameSnapshot.exists() && usernameSnapshot.val() !== user.uid) throw Object.assign(new Error('Nombre de usuario ocupado'), { code: 'username-taken' });
+								changes[`usernames/${username}`] = user.uid;
+							}
+							await update(ref(database), changes);
+						};
+						saveRequest().catch(error => showAccessPending(profile, firebaseErrorMessage(error)));
+					}
+				}, error => showAccessPending(null, firebaseErrorMessage(error)));
+			});
+			document.querySelector('#authGate').dataset.ready = 'true';
+	</script>
+</body>
+</html>
