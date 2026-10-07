@@ -84,6 +84,11 @@
 		td { border-bottom: 1px solid var(--line); padding: 13px 14px; font-size: 12px; white-space: nowrap; }
 		tr:last-child td { border-bottom: 0; }
 		.movement-name { font-weight: 700; font-size: 12px; color: var(--ink); }
+		.movement-grip { display: inline-grid; place-items: center; width: 26px; height: 24px; margin-right: 8px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--green-soft); color: var(--green); cursor: grab; touch-action: none; user-select: none; vertical-align: middle; font-size: 16px; line-height: 1; }
+		.movement-grip:hover { border-color: var(--green); }
+		.movement-grip:active { cursor: grabbing; }
+		.movement-row-dragging { opacity: .45; }
+		.movement-row-over { box-shadow: inset 0 2px var(--green); }
 		.movement-meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
 		.person-cell { display: flex; align-items: center; gap: 7px; }
 		.avatar { flex: 0 0 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 10px; font-weight: 750; }
@@ -328,6 +333,7 @@
 					<button class="tab" data-tab="all" role="tab" aria-selected="false">Todos</button>
 				</div>
 				<div class="table-tools"><input class="search" id="searchInput" type="search" placeholder="Buscar movimiento..." aria-label="Buscar movimiento"><select class="filter-select" id="personFilter" aria-label="Filtrar por persona"><option value="">Todas las personas</option></select></div>
+				<p class="panel-caption hidden" id="reorderHint" style="padding: 0 22px 10px">Mantén presionado el botón ⠿ de una fila y arrástrala para cambiar su posición.</p>
 				<div class="table-scroll">
 					<table><thead><tr><th>Movimiento</th><th>Persona</th><th>Fecha</th><th>Estado</th><th style="text-align:right">Importe</th><th></th></tr></thead><tbody id="movementRows"></tbody></table>
 					<div class="empty-state" id="emptyState"><div class="empty-symbol">＋</div><strong id="emptyTitle">Aún no hay movimientos</strong><div id="emptyCopy" style="margin-top:6px">Agrega el primer ingreso o gasto para comenzar.</div></div>
@@ -414,6 +420,9 @@
 			let currentType = 'income';
 			let activeTab = 'approved';
 			let editingMovementId = null;
+			let draggedMovementId = null;
+			let draggedMovementStartOrder = [];
+			let isReorderingMovements = false;
 			let toastTimer;
 
 			function localDate(date = new Date()) {
@@ -549,20 +558,30 @@
 				document.querySelector('#currentMonth').textContent = month.charAt(0).toUpperCase() + month.slice(1);
 				renderMemberReport();
 			}
+			function orderedMovements() {
+				const hasManualOrder = state.movements.length > 0 && state.movements.every(item => Number.isFinite(item.sortOrder));
+				return [...state.movements].sort((a, b) => hasManualOrder ? b.sortOrder - a.sortOrder : b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+			}
 			function visibleMovements() {
 				const query = document.querySelector('#searchInput').value.trim().toLocaleLowerCase('es-MX');
 				const person = document.querySelector('#personFilter').value;
-				return state.movements.filter(item => {
+				return orderedMovements().filter(item => {
 					const tabMatch = activeTab === 'all' || item.status === activeTab;
 					const personMatch = !person || item.person === person;
 					const queryMatch = !query || [item.description, item.category, item.person, item.notes].join(' ').toLocaleLowerCase('es-MX').includes(query);
 					return tabMatch && personMatch && queryMatch;
-				}).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+				});
+			}
+			function canReorderMovements() {
+				return !isReorderingMovements && isModerator();
 			}
 			function renderRows() {
+				if (isReorderingMovements) return;
 				const rows = visibleMovements();
 				const tbody = document.querySelector('#movementRows');
 				const canModerate = isModerator();
+				const canReorder = canReorderMovements();
+				document.querySelector('#reorderHint').classList.toggle('hidden', !canReorder);
 				tbody.innerHTML = rows.map(item => {
 					const typeLabel = item.type === 'income' ? 'Ingreso' : item.type === 'expense' ? 'Gasto' : item.type === 'cardPayment' ? `Pago de tarjeta · ${escapeHtml(item.cardName || 'Tarjeta')}` : `Traspaso · ${accountName(item.account)} a ${accountName(item.destination)}`;
 					const amountClass = item.type === 'income' ? 'income' : item.type === 'transfer' || item.type === 'cardPayment' ? 'transfer' : 'expense';
@@ -577,7 +596,8 @@
 					const recipient = item.type === 'transfer' && item.recipient && item.recipient !== item.person ? ` · para ${escapeHtml(item.recipient)}` : '';
 					const contributions = item.type === 'expense' && Array.isArray(item.contributions) ? ` · ${item.contributions.map(contribution => `${escapeHtml(contribution.person)} ${money(contribution.amount)} (${contribution.account === 'credit' ? `crédito ${escapeHtml(contribution.cardName)}` : accountName(contribution.account)})`).join(' + ')}` : '';
 					const category = item.type === 'cardPayment' ? 'Abono a tarjeta' : item.category || 'General';
-					return `<tr><td><div class="movement-name">${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${contributions}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${edit}${remove}</div></td></tr>`;
+					const grip = canReorder ? '<button class="movement-grip" type="button" title="Mantén presionado y arrastra para reordenar" aria-label="Mantén presionado y arrastra para reordenar">⠿</button>' : '';
+					return `<tr class="${canReorder ? 'movement-row-draggable' : ''}" data-id="${escapeHtml(item.id)}"><td><div class="movement-name">${grip}${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${contributions}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${edit}${remove}</div></td></tr>`;
 				}).join('');
 				const empty = rows.length === 0;
 				document.querySelector('.ledger .table-scroll table').classList.toggle('hidden', empty);
@@ -586,6 +606,20 @@
 				document.querySelector('#emptyCopy').textContent = activeTab === 'pending' ? 'Cuando alguien proponga un movimiento, aparecerá aquí.' : 'Agrega el primer ingreso o gasto para comenzar.';
 				const visibleExpenseTotal = rows.filter(item => item.type === 'expense').reduce((total, item) => total + (Number(item.amount) || 0), 0);
 				document.querySelector('#movementCaption').textContent = `${rows.length} movimientos · Gastos visibles ${money(visibleExpenseTotal)}`;
+			}
+			async function saveMovementOrder(ids) {
+				const visibleIds = new Set(visibleMovements().map(item => item.id));
+				if (ids.length !== visibleIds.size || ids.some(id => !visibleIds.has(id))) return;
+				let nextVisibleIndex = 0;
+				const orderedIds = orderedMovements().map(item => item.id);
+				const reorderedIds = orderedIds.map(id => visibleIds.has(id) ? ids[nextVisibleIndex++] : id);
+				isReorderingMovements = true;
+				const writes = reorderedIds.map((id, index) => update(ref(database, `movements/${id}`), { sortOrder: reorderedIds.length - index }));
+				const results = await Promise.allSettled(writes);
+				isReorderingMovements = false;
+				renderRows();
+				if (results.some(result => result.status === 'rejected')) { showToast('No se pudo guardar el orden. Inténtalo de nuevo.'); return; }
+				showToast('Orden de movimientos guardado.');
 			}
 			function updatePermissions() {
 				const moderator = isModerator();
@@ -820,7 +854,8 @@
 					date: String(form.get('date')),
 					notes: String(form.get('notes')).trim(),
 					status: existingMovement?.status || (isModerator() ? 'approved' : 'pending'),
-					createdAt: existingMovement?.createdAt || Date.now()
+					createdAt: existingMovement?.createdAt || Date.now(),
+					sortOrder: existingMovement?.sortOrder ?? Math.max(0, ...state.movements.map(item => Number.isFinite(item.sortOrder) ? item.sortOrder : 0)) + 1
 				};
 				document.querySelector('#submitButton').disabled = true;
 				try {
@@ -859,6 +894,37 @@
 				} else return;
 				} catch (error) { showToast(firebaseErrorMessage(error)); }
 			});
+			document.querySelector('#movementRows').addEventListener('pointerdown', event => {
+				const grip = event.target.closest('.movement-grip');
+				const row = grip?.closest('tr[data-id]');
+				if (!row || !canReorderMovements()) return;
+				event.preventDefault();
+				draggedMovementId = row.dataset.id;
+				draggedMovementStartOrder = [...document.querySelectorAll('#movementRows tr[data-id]')].map(item => item.dataset.id);
+				row.classList.add('movement-row-dragging');
+			});
+			document.addEventListener('pointermove', event => {
+				if (!draggedMovementId) return;
+				const row = document.elementFromPoint(event.clientX, event.clientY)?.closest('#movementRows tr[data-id]');
+				if (!row || row.dataset.id === draggedMovementId) return;
+				event.preventDefault();
+				document.querySelectorAll('#movementRows .movement-row-over').forEach(item => item.classList.remove('movement-row-over'));
+				row.classList.add('movement-row-over');
+				const rect = row.getBoundingClientRect();
+				const after = event.clientY > rect.top + rect.height / 2;
+				const draggedRow = document.querySelector(`#movementRows tr[data-id="${CSS.escape(draggedMovementId)}"]`);
+				if (after) row.after(draggedRow); else row.before(draggedRow);
+			});
+			function finishMovementDrag(saveOrder) {
+				if (!draggedMovementId) return;
+				const ids = [...document.querySelectorAll('#movementRows tr[data-id]')].map(row => row.dataset.id);
+				if (saveOrder && ids.some((id, index) => id !== draggedMovementStartOrder[index])) saveMovementOrder(ids);
+				draggedMovementId = null;
+				draggedMovementStartOrder = [];
+				document.querySelectorAll('#movementRows .movement-row-dragging, #movementRows .movement-row-over').forEach(row => row.classList.remove('movement-row-dragging', 'movement-row-over'));
+			}
+			document.addEventListener('pointerup', () => finishMovementDrag(true));
+			document.addEventListener('pointercancel', () => finishMovementDrag(false));
 			document.querySelector('#exportButton').addEventListener('click', () => {
 				const rows = [['Fecha', 'Tipo', 'Concepto', 'Categoría', 'Responsable', 'Aportaciones', 'Hacia familiar', 'Cuenta', 'Método de pago', 'Tarjeta', 'Destino', 'Importe', 'Estado', 'Nota'], ...state.movements.map(item => [item.date, item.type, item.description, item.category, item.person, JSON.stringify(item.contributions || []), item.recipient || '', accountName(item.account), item.paymentMethod || '', item.cardName || '', item.destination ? accountName(item.destination) : '', item.amount, item.status, item.notes || ''])];
 				const csv = '\ufeff' + rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\r\n');
