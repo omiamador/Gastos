@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="theme-color" content="#f2f4f3">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 	<title>Fam Amador Arellano</title>
 	<style>
 		:root {
@@ -65,6 +66,7 @@
 		.tab.active { color: var(--green); border-bottom-color: var(--green); }
 		.tab-count { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px; margin-left: 5px; border-radius: 4px; background: var(--gold-soft); color: var(--gold); font-size: 11px; }
 		.table-tools { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 22px; }
+		.filter-controls { display: flex; align-items: center; gap: 12px; }
 		.search { width: min(230px, 58%); border: 1px solid var(--line); border-radius: 4px; padding: 9px 11px; background: white; font-size: 12px; }
 		.filter-select { color: var(--muted); font-size: 12px; }
 		.table-scroll { overflow-x: auto; }
@@ -140,8 +142,10 @@
 		.review-actions { display: flex; gap: 6px; }
 		.review-button { border: 0; border-radius: 4px; padding: 6px 9px; color: white; background: var(--ink); font-size: 10px; font-weight: 700; }
 		.review-button.reject { color: var(--coral); background: var(--coral-soft); }
-		.toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); padding: 12px 18px; color: white; background: #243a31; border-radius: 7px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 5; }
-		.toast.show { opacity: 1; transform: translate(-50%, 0); }
+		.app-swal-popup { border-radius: 6px !important; font-family: "Aptos", "Trebuchet MS", sans-serif !important; }
+		.app-swal-confirm { border-radius: 4px !important; background: var(--green) !important; }
+		.app-swal-cancel { border-radius: 4px !important; background: var(--muted) !important; }
+		.app-swal-toast { border-radius: 6px !important; font-family: "Aptos", "Trebuchet MS", sans-serif !important; }
 		.hidden { display: none !important; }
 		.auth-gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--paper); }
 		.auth-stack { width: min(100%, 420px); }
@@ -240,6 +244,9 @@
 			.ledger .table-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
 			.ledger .search { width: 100%; min-width: 0; }
 			.ledger .filter-select { max-width: 135px; }
+			.ledger .table-tools { grid-template-columns: minmax(0, 1fr); }
+			.ledger .filter-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+			.ledger .filter-select { width: 100%; max-width: none; }
 			.ledger-actions { gap: 5px; }
 			.primary-small { min-height: 30px; padding: 0 8px; font-size: 11px; }
 			.ledger table, .ledger tbody { display: block; width: 100%; }
@@ -270,7 +277,6 @@
 				<h1>Fam Amador Arellano</h1>
 				<div class="field"><label for="loginIdentity">Usuario o correo</label><input id="loginIdentity" name="identity" type="text" autocomplete="username" required></div>
 				<div class="field"><label for="loginPassword">Contraseña</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
-				<div class="auth-error" id="authError" role="alert"></div>
 				<div class="auth-actions"><button class="submit-button" type="submit">Iniciar sesión</button><button class="text-button" id="resetPassword" type="button">Recuperar contraseña</button></div>
 				<button class="text-button" id="showSignup" type="button">Crear usuario familiar</button>
 				<p class="auth-note">Las cuentas nuevas requieren aprobación de Omi. Si olvidas la contraseña, tendrás que pedir ayuda; no se envían correos de recuperación.</p>
@@ -281,7 +287,6 @@
 				<h1>Crear usuario</h1>
 				<div class="field"><label for="signupUsername">Nombre de usuario</label><input id="signupUsername" name="username" type="text" minlength="3" maxlength="25" pattern="[a-zA-Z0-9_-]+" autocomplete="username" autocapitalize="none" required placeholder="Ej. oamador"></div>
 				<div class="field"><label for="signupPassword">Contraseña (mínimo 6 caracteres)</label><input id="signupPassword" name="password" type="password" minlength="6" autocomplete="new-password" required></div>
-				<div class="auth-error" id="signupError" role="alert"></div>
 				<button class="submit-button" type="submit">Crear cuenta y pedir acceso</button>
 				<button class="text-button" id="showLogin" type="button">Ya tengo una cuenta</button>
 				<p class="auth-note">Firebase generará un correo interno para tu usuario. No sirve para recuperar contraseñas; si la olvidas, contacta a Omi.</p>
@@ -332,7 +337,7 @@
 					<button class="tab" data-tab="pending" role="tab" aria-selected="false">Por revisar <span class="tab-count" id="pendingCount">0</span></button>
 					<button class="tab" data-tab="all" role="tab" aria-selected="false">Todos</button>
 				</div>
-				<div class="table-tools"><input class="search" id="searchInput" type="search" placeholder="Buscar movimiento..." aria-label="Buscar movimiento"><select class="filter-select" id="personFilter" aria-label="Filtrar por persona"><option value="">Todas las personas</option></select></div>
+				<div class="table-tools"><input class="search" id="searchInput" type="search" placeholder="Buscar movimiento..." aria-label="Buscar movimiento"><div class="filter-controls"><select class="filter-select" id="personFilter" aria-label="Filtrar por persona"><option value="">Todas las personas</option></select><select class="filter-select" id="categoryFilter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option></select></div></div>
 				<p class="panel-caption hidden" id="reorderHint" style="padding: 0 22px 10px">Mantén presionado el botón ⠿ de una fila y arrástrala para cambiar su posición.</p>
 				<div class="table-scroll">
 					<table><thead><tr><th>Movimiento</th><th>Persona</th><th>Fecha</th><th>Estado</th><th style="text-align:right">Importe</th><th></th></tr></thead><tbody id="movementRows"></tbody></table>
@@ -385,8 +390,8 @@
 			</details>
 		</section>
 	</main>
-	<div class="toast" id="toast" role="status" aria-live="polite"></div>
 	</div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script type="module">
 		import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
 		import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
@@ -423,7 +428,6 @@
 			let draggedMovementId = null;
 			let draggedMovementStartOrder = [];
 			let isReorderingMovements = false;
-			let toastTimer;
 
 			function localDate(date = new Date()) {
 				return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -562,14 +566,26 @@
 				const hasManualOrder = state.movements.length > 0 && state.movements.every(item => Number.isFinite(item.sortOrder));
 				return [...state.movements].sort((a, b) => hasManualOrder ? b.sortOrder - a.sortOrder : b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
 			}
+			function movementCategory(item) {
+				return item.type === 'cardPayment' ? 'Abono a tarjeta' : item.category || 'General';
+			}
+			function updateCategoryFilter() {
+				const categoryFilter = document.querySelector('#categoryFilter');
+				const selectedCategory = categoryFilter.value;
+				const categories = [...new Set(state.movements.map(movementCategory))].sort((a, b) => a.localeCompare(b, 'es-MX'));
+				categoryFilter.innerHTML = '<option value="">Todas las categorías</option>' + categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join('');
+				if (categories.includes(selectedCategory)) categoryFilter.value = selectedCategory;
+			}
 			function visibleMovements() {
 				const query = document.querySelector('#searchInput').value.trim().toLocaleLowerCase('es-MX');
 				const person = document.querySelector('#personFilter').value;
+				const category = document.querySelector('#categoryFilter').value;
 				return orderedMovements().filter(item => {
 					const tabMatch = activeTab === 'all' || item.status === activeTab;
 					const personMatch = !person || item.person === person;
+					const categoryMatch = !category || movementCategory(item) === category;
 					const queryMatch = !query || [item.description, item.category, item.person, item.notes].join(' ').toLocaleLowerCase('es-MX').includes(query);
-					return tabMatch && personMatch && queryMatch;
+					return tabMatch && personMatch && categoryMatch && queryMatch;
 				});
 			}
 			function canReorderMovements() {
@@ -577,6 +593,7 @@
 			}
 			function renderRows() {
 				if (isReorderingMovements) return;
+				updateCategoryFilter();
 				const rows = visibleMovements();
 				const tbody = document.querySelector('#movementRows');
 				const canModerate = isModerator();
@@ -595,7 +612,7 @@
 					const payment = item.type === 'expense' ? ` · ${item.paymentMethod === 'shared' ? 'Gasto compartido' : item.paymentMethod === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : item.paymentMethod === 'debit' ? 'Tarjeta de débito' : item.paymentMethod === 'transfer' ? 'Transferencia' : item.account === 'credit' ? `Crédito · ${escapeHtml(item.cardName || 'Tarjeta')}` : 'Efectivo'}` : item.type === 'cardPayment' ? ` · desde ${accountName(item.account)}` : '';
 					const recipient = item.type === 'transfer' && item.recipient && item.recipient !== item.person ? ` · para ${escapeHtml(item.recipient)}` : '';
 					const contributions = item.type === 'expense' && Array.isArray(item.contributions) ? ` · ${item.contributions.map(contribution => `${escapeHtml(contribution.person)} ${money(contribution.amount)} (${contribution.account === 'credit' ? `crédito ${escapeHtml(contribution.cardName)}` : accountName(contribution.account)})`).join(' + ')}` : '';
-					const category = item.type === 'cardPayment' ? 'Abono a tarjeta' : item.category || 'General';
+					const category = movementCategory(item);
 					const grip = canReorder ? '<button class="movement-grip" type="button" title="Mantén presionado y arrastra para reordenar" aria-label="Mantén presionado y arrastra para reordenar">⠿</button>' : '';
 					return `<tr class="${canReorder ? 'movement-row-draggable' : ''}" data-id="${escapeHtml(item.id)}"><td><div class="movement-name">${grip}${escapeHtml(item.description)}</div><div class="movement-meta">${escapeHtml(typeLabel)} · ${escapeHtml(category)}${payment}${recipient}${contributions}${creator}${note}</div></td><td><div class="person-cell"><span class="avatar">${escapeHtml(initials(item.person))}</span>${escapeHtml(item.person)}</div></td><td>${new Date(`${item.date}T12:00:00`).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td>${review || status}</td><td class="amount ${amountClass}">${amountPrefix} ${money(item.amount)}</td><td><div class="row-actions">${edit}${remove}</div></td></tr>`;
 				}).join('');
@@ -618,8 +635,8 @@
 				const results = await Promise.allSettled(writes);
 				isReorderingMovements = false;
 				renderRows();
-				if (results.some(result => result.status === 'rejected')) { showToast('No se pudo guardar el orden. Inténtalo de nuevo.'); return; }
-				showToast('Orden de movimientos guardado.');
+				if (results.some(result => result.status === 'rejected')) { showToast('No se pudo guardar el orden. Inténtalo de nuevo.', 'error'); return; }
+				showToast('Orden de movimientos guardado.', 'success');
 			}
 			function updatePermissions() {
 				const moderator = isModerator();
@@ -640,12 +657,17 @@
 				document.querySelector('#accessRequestList').innerHTML = pending.length ? pending.map(request => `<div class="access-request"><div><div class="access-request-name">${escapeHtml(request.username)}</div><div class="access-request-date">Solicitó acceso ${new Date(request.requestedAt).toLocaleDateString('es-MX')}</div></div><div class="access-request-actions"><button data-access="approve" data-uid="${escapeHtml(request.uid)}">Aprobar</button><button class="reject" data-access="reject" data-uid="${escapeHtml(request.uid)}">Rechazar</button></div></div>`).join('') : '<span class="panel-caption">No hay solicitudes nuevas.</span>';
 			}
 			function render() { updateSummary(); updatePermissions(); }
-			function showToast(message) {
-				const toast = document.querySelector('#toast');
-				toast.textContent = message;
-				toast.classList.add('show');
-				clearTimeout(toastTimer);
-				toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+			function showToast(message, icon = 'info') {
+				Swal.fire({
+					toast: true,
+					position: 'top-end',
+					icon,
+					title: message,
+					showConfirmButton: false,
+					timer: 3200,
+					timerProgressBar: true,
+					customClass: { popup: 'app-swal-toast' }
+				});
 			}
 			function setType(type) {
 				currentType = type;
@@ -805,6 +827,7 @@
 			}));
 			document.querySelector('#searchInput').addEventListener('input', renderRows);
 			document.querySelector('#personFilter').addEventListener('change', renderRows);
+			document.querySelector('#categoryFilter').addEventListener('change', renderRows);
 			document.querySelector('#openMovement').addEventListener('click', () => { resetMovementForm(); document.querySelector('#movementDialog').showModal(); });
 			document.querySelector('#closeMovement').addEventListener('click', () => document.querySelector('#movementDialog').close());
 			document.querySelector('#movementDialog').addEventListener('click', event => { if (event.target === event.currentTarget) event.currentTarget.close(); });
@@ -888,7 +911,17 @@
 					await remove(movementRef);
 					showToast('Propuesta rechazada y eliminada.');
 				} else if (button.dataset.action === 'delete' && (isModerator() || (movement.createdBy === authUser.uid && movement.status === 'pending'))) {
-					if (!confirm('¿Eliminar este movimiento?')) return;
+					const confirmation = await Swal.fire({
+						title: '¿Eliminar este movimiento?',
+						text: 'Esta acción no se puede deshacer.',
+						icon: 'warning',
+						showCancelButton: true,
+						confirmButtonText: 'Sí, eliminar',
+						cancelButtonText: 'Cancelar',
+						reverseButtons: true,
+						customClass: { popup: 'app-swal-popup', confirmButton: 'app-swal-confirm', cancelButton: 'app-swal-cancel' }
+					});
+					if (!confirmation.isConfirmed) return;
 					await remove(movementRef);
 					showToast('Movimiento eliminado.');
 				} else return;
@@ -1000,9 +1033,8 @@
 			document.querySelector('#loginForm').addEventListener('submit', async event => {
 				event.preventDefault();
 				const form = new FormData(event.currentTarget);
-				document.querySelector('#authError').textContent = '';
 				try { await signInWithEmailAndPassword(auth, authEmailFromIdentity(form.get('identity')), String(form.get('password'))); }
-				catch (error) { document.querySelector('#authError').textContent = firebaseErrorMessage(error); }
+				catch (error) { showToast(firebaseErrorMessage(error), 'error'); }
 			});
 			document.querySelector('#showSignup').addEventListener('click', () => showAuthView('signup'));
 			document.querySelector('#showLogin').addEventListener('click', () => showAuthView('login'));
@@ -1011,23 +1043,21 @@
 				const form = new FormData(event.currentTarget);
 				const username = normalizeUsername(form.get('username'));
 				const password = String(form.get('password'));
-				const errorBox = document.querySelector('#signupError');
 				const submit = event.currentTarget.querySelector('button[type="submit"]');
-				errorBox.textContent = '';
-				if (!/^[a-z0-9_-]{3,25}$/.test(username)) { errorBox.textContent = 'Usa de 3 a 25 letras, números, guiones o guiones bajos.'; return; }
-				if (['natividad', 'lizeth', 'joseluis', 'diana', 'carlos', 'omi'].includes(username)) { errorBox.textContent = 'Ese nombre está reservado para identificar a un familiar.'; return; }
+				if (!/^[a-z0-9_-]{3,25}$/.test(username)) { showToast('Usa de 3 a 25 letras, números, guiones o guiones bajos.', 'warning'); return; }
+				if (['natividad', 'lizeth', 'joseluis', 'diana', 'carlos', 'omi'].includes(username)) { showToast('Ese nombre está reservado para identificar a un familiar.', 'warning'); return; }
 				submit.disabled = true;
 				try {
 					await createUserWithEmailAndPassword(auth, authEmailFromIdentity(username), password);
 					showToast('Cuenta creada. Enviando la solicitud a Omi…');
-				} catch (error) { errorBox.textContent = firebaseErrorMessage(error); }
+				} catch (error) { showToast(firebaseErrorMessage(error), 'error'); }
 				finally { submit.disabled = false; }
 			});
 			document.querySelector('#resetPassword').addEventListener('click', async () => {
 				const identity = document.querySelector('#loginIdentity').value.trim();
-				if (!identity.includes('@')) { document.querySelector('#authError').textContent = 'Los usuarios nuevos no tienen un buzón real. Si olvidaste tu contraseña, contacta a Omi.'; return; }
-				try { await sendPasswordResetEmail(auth, identity.toLowerCase()); document.querySelector('#authError').textContent = 'Si existe una cuenta con ese correo, recibirá un enlace para recuperar la contraseña.'; }
-				catch (error) { document.querySelector('#authError').textContent = firebaseErrorMessage(error); }
+				if (!identity.includes('@')) { showToast('Los usuarios nuevos no tienen un buzón real. Si olvidaste tu contraseña, contacta a Omi.', 'warning'); return; }
+				try { await sendPasswordResetEmail(auth, identity.toLowerCase()); showToast('Si existe una cuenta con ese correo, recibirá un enlace para recuperar la contraseña.'); }
+				catch (error) { showToast(firebaseErrorMessage(error), 'error'); }
 			});
 			document.querySelector('#signOutButton').addEventListener('click', () => signOut(auth));
 			document.querySelector('#signOutPending').addEventListener('click', () => signOut(auth));
